@@ -5,7 +5,7 @@ Setup reproductible pour installer le workflow Codex de reference sur un Mac:
 - instructions globales `~/.codex/AGENTS.md`;
 - agents Codex `~/.codex/agents/*.toml`;
 - skills personnels `~/.codex/skills/<skill>/`;
-- template optionnel `~/.codex/config.toml`;
+- template optionnel `~/.codex/config.toml` avec multi-agent, memories et plugins usuels;
 - scripts de validation et de synchronisation.
 
 Le depot ne versionne pas l'authentification, les logs, les sessions, les caches, les memories, les plugins installes, ni les fichiers d'etat Codex.
@@ -128,6 +128,8 @@ Pre-requis:
 - acces SSH au depot si clone via `git@github.com:hachache/Codex-Setup.git`.
 
 Le script ne gere pas l'authentification Codex. Chaque utilisateur doit se connecter avec son propre compte.
+
+Le template `config/config.template.toml` evite les chemins personnels, les projets trustes et les MCP locaux. Il active seulement les options et plugins generiques du workflow.
 
 ## Rollback
 

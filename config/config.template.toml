@@ -8,6 +8,36 @@ multi_agent = true
 memories = true
 js_repl = false
 
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."gmail@openai-curated"]
+enabled = true
+
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
 [desktop]
 conversationDetailMode = "STEPS_COMMANDS"
 followUpQueueMode = "queue"
@@ -28,3 +58,7 @@ Rules:
 
 [desktop.open-in-target-preferences]
 global = "cursor"
+
+[memories]
+generate_memories = true
+use_memories = true
