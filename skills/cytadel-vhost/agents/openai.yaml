@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cytadel Vhost"
+  short_description: "Add Cytadel Ansible website vhosts safely"
+  default_prompt: "Use $cytadel-vhost to add or review a Cytadel Ansible website_vhosts entry in a client repository."

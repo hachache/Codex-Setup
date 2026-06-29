@@ -8,7 +8,9 @@ Usage: ./install.sh [options]
 Options:
   --dry-run         Affiche les actions sans modifier le poste.
   --no-backup      N'ecrit pas de sauvegarde avant remplacement.
+  --no-skills      N'installe pas les skills personnels versionnes.
   --prune-agents   Supprime de ~/.codex/agents les agents TOML absents du repo.
+  --prune-skills   Supprime de ~/.codex/skills les skills absents du repo.
   --install-config Installe config/config.template.toml si config.toml est absent.
   --force-config   Remplace config.toml par le template apres sauvegarde.
   --help           Affiche cette aide.
@@ -48,6 +50,23 @@ backup_file() {
   run cp -p "$backup_src" "$backup_path"
 }
 
+backup_path() {
+  backup_src=$1
+  backup_rel=$2
+
+  [ "$BACKUP" = "1" ] || return 0
+  [ -e "$backup_src" ] || return 0
+
+  backup_dest="$BACKUP_DIR/$backup_rel"
+  backup_parent=$(dirname "$backup_dest")
+  run mkdir -p "$backup_parent"
+  if [ -d "$backup_src" ]; then
+    run cp -pR "$backup_src" "$backup_dest"
+  else
+    run cp -p "$backup_src" "$backup_dest"
+  fi
+}
+
 install_file() {
   src=$1
   dest=$2
@@ -68,9 +87,32 @@ install_file() {
   info "installed: $dest"
 }
 
+install_dir() {
+  dir_src=$1
+  dir_dest=$2
+  dir_rel=$3
+
+  [ -d "$dir_src" ] || die "source introuvable: $dir_src"
+
+  dir_parent=$(dirname "$dir_dest")
+  run mkdir -p "$dir_parent"
+
+  if [ -d "$dir_dest" ] && diff -qr "$dir_src" "$dir_dest" >/dev/null 2>&1; then
+    info "ok: $dir_dest"
+    return 0
+  fi
+
+  backup_path "$dir_dest" "$dir_rel"
+  run rm -rf "$dir_dest"
+  run cp -pR "$dir_src" "$dir_dest"
+  info "installed: $dir_dest"
+}
+
 DRY_RUN=0
 BACKUP=1
+INSTALL_SKILLS=1
 PRUNE_AGENTS=0
+PRUNE_SKILLS=0
 INSTALL_CONFIG=0
 FORCE_CONFIG=0
 
@@ -82,8 +124,14 @@ while [ "$#" -gt 0 ]; do
     --no-backup)
       BACKUP=0
       ;;
+    --no-skills)
+      INSTALL_SKILLS=0
+      ;;
     --prune-agents)
       PRUNE_AGENTS=1
+      ;;
+    --prune-skills)
+      PRUNE_SKILLS=1
       ;;
     --install-config)
       INSTALL_CONFIG=1
@@ -108,6 +156,7 @@ done
 REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CODEX_HOME=${CODEX_HOME:-"$HOME/.codex"}
 TARGET_AGENTS="$CODEX_HOME/agents"
+TARGET_SKILLS="$CODEX_HOME/skills"
 TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
 BACKUP_DIR="$CODEX_HOME/backups/Codex-Setup-$TIMESTAMP"
 
@@ -130,6 +179,15 @@ for src in "$REPO_DIR"/agents/*.toml; do
   install_file "$src" "$TARGET_AGENTS/$base" "agents/$base"
 done
 
+if [ "$INSTALL_SKILLS" = "1" ] && [ -d "$REPO_DIR/skills" ]; then
+  run mkdir -p "$TARGET_SKILLS"
+  for skill_src in "$REPO_DIR"/skills/*; do
+    [ -d "$skill_src" ] || continue
+    skill_base=$(basename "$skill_src")
+    install_dir "$skill_src" "$TARGET_SKILLS/$skill_base" "skills/$skill_base"
+  done
+fi
+
 if [ "$PRUNE_AGENTS" = "1" ]; then
   for dest in "$TARGET_AGENTS"/*.toml; do
     [ -f "$dest" ] || continue
@@ -140,6 +198,20 @@ if [ "$PRUNE_AGENTS" = "1" ]; then
     info "removed unmanaged agent: $dest"
   done
 fi
+
+if [ "$PRUNE_SKILLS" = "1" ] && [ -d "$TARGET_SKILLS" ]; then
+  for skill_dest in "$TARGET_SKILLS"/*; do
+    [ -d "$skill_dest" ] || continue
+    skill_base=$(basename "$skill_dest")
+    [ "$skill_base" = ".system" ] && continue
+    [ "$skill_base" = "codex-primary-runtime" ] && continue
+    [ -d "$REPO_DIR/skills/$skill_base" ] && continue
+    backup_path "$skill_dest" "skills/$skill_base"
+    run rm -rf "$skill_dest"
+    info "removed unmanaged skill: $skill_dest"
+  done
+fi
+
 
 if [ "$INSTALL_CONFIG" = "1" ]; then
   config_src="$REPO_DIR/config/config.template.toml"

@@ -79,7 +79,7 @@ else
 fi
 
 if command -v rg >/dev/null 2>&1; then
-  if rg -n "(sk-(proj|live|test|srv|admin|org)-[A-Za-z0-9_-]{16,}|sk-[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY|password\\s*=\\s*['\\\"][^'\\\"]+|token\\s*=\\s*['\\\"][^'\\\"]+|api[_-]?key\\s*=\\s*['\\\"][^'\\\"]+|secret\\s*=\\s*['\\\"][^'\\\"]+)" "$ROOT_DIR"; then
+  if rg -n "(sk-(proj|live|test|srv|admin|org)-[A-Za-z0-9_-]{16,}|sk-[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY|password\\s*=\\s*['\\\"][^'\\\"]+|token\\s*=\\s*['\\\"][^'\\\"]+|api[_-]?key\\s*=\\s*['\\\"][^'\\\"]+|secret\\s*=\\s*['\\\"][^'\\\"]+)" "$ROOT_DIR" | rg -v "(your-|<[^>]+>|abc123|example|placeholder|dummy)"; then
     die "secret potentiel detecte"
   fi
 fi

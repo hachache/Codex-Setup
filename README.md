@@ -4,10 +4,16 @@ Setup reproductible pour installer le workflow Codex de reference sur un Mac:
 
 - instructions globales `~/.codex/AGENTS.md`;
 - agents Codex `~/.codex/agents/*.toml`;
+- skills personnels `~/.codex/skills/<skill>/`;
 - template optionnel `~/.codex/config.toml`;
 - scripts de validation et de synchronisation.
 
 Le depot ne versionne pas l'authentification, les logs, les sessions, les caches, les memories, les plugins installes, ni les fichiers d'etat Codex.
+
+Docs:
+
+- [Agents](docs/agents.md)
+- [Skills](docs/skills.md)
 
 ## Installation rapide
 
@@ -34,7 +40,9 @@ Forcer le remplacement du `config.toml` existant:
 ```text
 --dry-run         Affiche les actions sans modifier le poste.
 --no-backup      N'ecrit pas de sauvegarde avant remplacement.
+--no-skills      N'installe pas les skills personnels versionnes.
 --prune-agents   Supprime de ~/.codex/agents les agents TOML absents du repo.
+--prune-skills   Supprime de ~/.codex/skills les skills absents du repo.
 --install-config Installe config/config.template.toml si config.toml est absent.
 --force-config   Remplace config.toml par le template apres sauvegarde.
 --help           Affiche l'aide.
@@ -52,6 +60,7 @@ CODEX_HOME="$HOME/.codex" ./install.sh
 |---|---|
 | `AGENTS.md` | `~/.codex/AGENTS.md` |
 | `agents/*.toml` | `~/.codex/agents/*.toml` |
+| `skills/<skill>/` | `~/.codex/skills/<skill>/` |
 | `config/config.template.toml` | `~/.codex/config.toml` avec `--install-config` |
 
 Les fichiers existants remplaces sont sauvegardes dans:
@@ -87,7 +96,8 @@ git push origin main
 `sync-from-local.sh` copie uniquement:
 
 - `~/.codex/AGENTS.md`;
-- `~/.codex/agents/*.toml`.
+- `~/.codex/agents/*.toml`;
+- les skills personnels de `~/.codex/skills/`, hors `.system` et `codex-primary-runtime`.
 
 Verifier un poste deja installe:
 
@@ -105,6 +115,8 @@ Il ne copie jamais:
 - `~/.codex/plugins`;
 - `~/.codex/sessions`;
 - `~/.codex/attachments`.
+- `~/.codex/skills/.system`;
+- `~/.codex/skills/codex-primary-runtime`.
 
 ## Premier poste Mac
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CV Site From Sources"
+  short_description: "Build factual CV sites from source documents"
+  default_prompt: "Use $cv-site-from-sources to build or revise a factual portfolio/CV site from a PDF, assets, and repository context."

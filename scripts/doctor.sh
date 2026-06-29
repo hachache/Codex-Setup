@@ -4,6 +4,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 CODEX_HOME=${CODEX_HOME:-"$HOME/.codex"}
 TARGET_AGENTS="$CODEX_HOME/agents"
+TARGET_SKILLS="$CODEX_HOME/skills"
 
 status=0
 
@@ -64,6 +65,34 @@ if [ "$missing" -eq 0 ] && [ "$different" -eq 0 ]; then
 else
   printf 'FAIL: agents missing=%s different=%s\n' "$missing" "$different" >&2
   status=1
+fi
+
+if [ -d "$ROOT_DIR/skills" ]; then
+  check "dossier skills installe" test -d "$TARGET_SKILLS"
+
+  skill_missing=0
+  skill_different=0
+  for skill_src in "$ROOT_DIR"/skills/*; do
+    [ -d "$skill_src" ] || continue
+    skill_base=$(basename "$skill_src")
+    skill_dest="$TARGET_SKILLS/$skill_base"
+    if [ ! -d "$skill_dest" ]; then
+      printf 'MISSING SKILL: %s\n' "$skill_base" >&2
+      skill_missing=$((skill_missing + 1))
+      continue
+    fi
+    if ! diff -qr "$skill_src" "$skill_dest" >/dev/null 2>&1; then
+      printf 'DIFF SKILL: %s\n' "$skill_base" >&2
+      skill_different=$((skill_different + 1))
+    fi
+  done
+
+  if [ "$skill_missing" -eq 0 ] && [ "$skill_different" -eq 0 ]; then
+    printf 'OK: skills alignes\n'
+  else
+    printf 'FAIL: skills missing=%s different=%s\n' "$skill_missing" "$skill_different" >&2
+    status=1
+  fi
 fi
 
 exit "$status"
