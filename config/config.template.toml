@@ -1,0 +1,30 @@
+model = "gpt-5.5"
+model_reasoning_effort = "low"
+personality = "pragmatic"
+service_tier = "default"
+
+[features]
+multi_agent = true
+memories = true
+js_repl = false
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+followUpQueueMode = "queue"
+git-commit-instructions = """
+Write commit messages using Conventional Commits.
+
+Rules:
+- Format: type(scope): subject
+- Subject must be short, specific, imperative, and lowercase unless proper noun.
+- Max 72 characters for the subject line.
+- Allowed types: feat, fix, refactor, docs, test, chore, ci, perf, build.
+- One commit = one logical change.
+- Do not mix unrelated changes.
+- Add a body only when useful, to explain why.
+- Explicitly mention breaking changes.
+- Avoid useless messages like "update", "wip", "tmp", "fix bug", "changes".
+"""
+
+[desktop.open-in-target-preferences]
+global = "cursor"
