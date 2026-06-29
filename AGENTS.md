@@ -45,6 +45,20 @@
 - Utiliser `apply_patch` pour les edits manuels.
 - Verifier apres modification avec les commandes adaptees.
 
+## Boucle de developpement automatique
+
+Pour toute tache de code, debug, documentation, infra ou maintenance:
+
+1. Identifier l'objectif, le perimetre, les contraintes et les criteres de succes.
+2. Lire les sources pertinentes avant modification.
+3. Planifier le plus petit changement correct.
+4. Implementer.
+5. Executer les tests, linters, builds, plans, dry-runs ou verifications exactes.
+6. Analyser les echecs par cause racine.
+7. Corriger et repeter jusqu'a preuve concrete de reussite.
+
+Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou apres 3 cycles de correction infructueux. Ne jamais boucler indefiniment.
+
 ## Routage subagents
 
 - Quand une demande correspond clairement a un agent installe dans `~/.codex/agents`, utiliser cet agent automatiquement.

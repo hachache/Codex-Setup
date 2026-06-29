@@ -46,6 +46,27 @@ for file in "$ROOT_DIR"/agents/*.toml; do
       missing=1
     fi
   done
+  effort=$(sed -n 's/^model_reasoning_effort = "\(.*\)"$/\1/p' "$file" | head -n 1)
+  case "$effort" in
+    medium|xhigh)
+      ;;
+    high)
+      printf 'invalid effort, use xhigh instead of high: %s\n' "$file" >&2
+      missing=1
+      ;;
+    *)
+      printf 'unknown model_reasoning_effort %s: %s\n' "$effort" "$file" >&2
+      missing=1
+      ;;
+  esac
+  if ! grep -q '^Technical depth:$' "$file"; then
+    printf 'missing Technical depth block: %s\n' "$file" >&2
+    missing=1
+  fi
+  if ! grep -q '^Development loop:$' "$file"; then
+    printf 'missing Development loop block: %s\n' "$file" >&2
+    missing=1
+  fi
 done
 
 [ "$missing" -eq 0 ] || die "schema agent invalide"
@@ -61,13 +82,38 @@ except ModuleNotFoundError:
     try:
         import tomli as tomllib
     except ModuleNotFoundError:
-        print("WARN: python3 sans tomllib/tomli; validation TOML parse ignoree", file=sys.stderr)
-        raise SystemExit(0)
+        print("ERROR: python3 doit fournir tomllib ou tomli pour valider les agents", file=sys.stderr)
+        raise SystemExit(1)
 
 root = pathlib.Path(sys.argv[1])
+required = {
+    "name",
+    "description",
+    "model",
+    "model_reasoning_effort",
+    "sandbox_mode",
+    "developer_instructions",
+}
 for path in sorted((root / "agents").glob("*.toml")):
     with path.open("rb") as handle:
-        tomllib.load(handle)
+        data = tomllib.load(handle)
+    missing = sorted(required - data.keys())
+    if missing:
+        raise SystemExit(f"{path}: champs manquants: {', '.join(missing)}")
+    if data["name"] != path.stem:
+        raise SystemExit(f"{path}: name ne correspond pas au nom du fichier")
+    if data["model_reasoning_effort"] not in {"medium", "xhigh"}:
+        raise SystemExit(f"{path}: model_reasoning_effort invalide: {data['model_reasoning_effort']}")
+    instructions = data["developer_instructions"]
+    for section in ("Technical depth:", "Development loop:"):
+        if section not in instructions:
+            raise SystemExit(f"{path}: section manquante dans developer_instructions: {section}")
+    technical = instructions.split("Technical depth:", 1)[1].split("Development loop:", 1)[0]
+    loop = instructions.split("Development loop:", 1)[1]
+    if technical.count("\n- ") < 3:
+        raise SystemExit(f"{path}: section Technical depth trop faible")
+    if "3 unsuccessful correction cycles" not in loop:
+        raise SystemExit(f"{path}: boucle de developpement non bornee")
 template = root / "config" / "config.template.toml"
 if template.exists():
     with template.open("rb") as handle:
@@ -75,7 +121,7 @@ if template.exists():
 print("TOML OK")
 PY
 else
-  printf 'WARN: python3 introuvable; validation TOML parse ignoree\n' >&2
+  die "python3 introuvable: validation TOML obligatoire"
 fi
 
 if command -v rg >/dev/null 2>&1; then
