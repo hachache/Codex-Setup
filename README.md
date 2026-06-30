@@ -13,6 +13,7 @@ L'objectif: cloner le depot, lancer un script, retrouver le meme workflow Codex 
 - **Securite**: aucun secret, auth, cache, session, memory ou plugin local n'est versionne.
 - **Qualite**: `validate.sh`, `doctor.sh`, ShellCheck, Gitleaks, checks whitespace et installation isolee.
 - **Routage intelligent**: Fast, Standard et Critical modes pour eviter de bruler du quota sur les petites taches.
+- **Boucles invocables**: `Fast loop`, `Standard loop` et `Critical loop` avec budgets de retry bornes.
 - **Pipeline critique**: orchestrator, implementer, reviewer, security, performance et gatekeeper seulement quand le risque le justifie.
 - **Release propre**: tag `v*`, archive `tar.gz`, checksum SHA-256 et GitHub Release automatique.
 

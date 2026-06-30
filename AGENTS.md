@@ -47,17 +47,19 @@
 
 ## Boucle de developpement automatique
 
-Pour toute tache de code, debug, documentation, infra ou maintenance:
+Pour toute tache de code, debug, documentation, infra ou maintenance, utiliser la plus petite boucle bornee qui peut prouver la reussite.
 
-1. Identifier l'objectif, le perimetre, les contraintes et les criteres de succes.
-2. Lire les sources pertinentes avant modification.
-3. Planifier le plus petit changement correct.
-4. Implementer.
-5. Executer les tests, linters, builds, plans, dry-runs ou verifications exactes.
-6. Analyser les echecs par cause racine.
-7. Corriger et repeter jusqu'a preuve concrete de reussite.
+Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.
 
-Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou apres 3 cycles de correction infructueux. Ne jamais boucler indefiniment.
+Budgets:
+
+- Fast loop: 1 passe, 0 a 1 correction, verification ciblee.
+- Standard loop: 1 a 2 cycles de correction, tests/checks adaptes, revue legere.
+- Critical loop: pipeline complet avec jusqu'a 3 cycles de correction, gate finale obligatoire.
+
+Chaque retry doit etre justifie par une cause concrete: test casse, linter/format, comportement incorrect, manque de preuve, risque securite/performance ou ambiguite utilisateur. Ne jamais relancer une validation echouee sans avoir change la cause pertinente.
+
+Arreter la boucle quand la reussite est prouvee, quand le risque residuel est acceptable pour le mode choisi, quand un vrai blocage existe, ou quand le budget de retry est epuise. Ne jamais boucler indefiniment.
 
 ## Mode d'execution par defaut
 
@@ -90,6 +92,25 @@ Utiliser pour le developpement normal: feature classique, bug non trivial, refac
 Utiliser seulement pour les changements a fort risque: securite, auth, secrets, permissions, CI/CD, production, infrastructure, Docker, Kubernetes, Terraform, Ansible, migration DB, perte de donnees, performance, scalabilite, cout, gros refactor ou architecture multi-fichiers.
 
 Critical mode active le pipeline auto-verifiant complet.
+
+## Boucles invocables dans le chat
+
+L'utilisateur peut forcer une boucle en disant `Fast loop`, `Standard loop`, `Critical loop`, `boucle fast`, `boucle standard` ou `boucle critical`.
+
+- Si la boucle demandee est suffisante pour le risque, l'utiliser explicitement.
+- Si la boucle demandee est trop faible pour le risque, escalader et expliquer brievement la raison.
+- Si `Critical loop` est invoquee, appliquer le pipeline auto-verifiant complet.
+- Si aucune boucle n'est nommee, choisir automatiquement Fast, Standard ou Critical selon le risque.
+
+Pour Standard et Critical, tenir un evidence ledger leger:
+
+```text
+changed:
+checks:
+failures:
+fixes:
+residual_risks:
+```
 
 ## Efficacite contexte et tokens
 
