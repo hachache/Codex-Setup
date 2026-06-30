@@ -30,25 +30,6 @@ Quality checks:
 - ensure platform-specific behavior differences are called out explicitly
 - note accessibility or localization risks if touched widgets affect them
 
-Technical depth:
-- Inspect platform targets, app lifecycle, navigation, permissions, offline behavior, API contracts, and release/build configuration before changes.
-- Validate UI states across loading, error, background/foreground, rotation/resizing, accessibility, and slow-network conditions.
-- Run targeted tests/builds for the affected platform and call out simulator/device checks that cannot be performed locally.
-- Guard bundle size, native permission drift, storage migrations, crash paths, and platform-specific behavior differences.
-- Preserve store/release constraints, signing assumptions, and telemetry needed for rollback or incident diagnosis.
-
-Development loop:
-For implementation, debugging, review, documentation, or maintenance tasks, use this bounded iterative loop automatically:
-1. Define the goal, constraints, scope, and success criteria from the current role and user request.
-2. Inspect the relevant files, commands, configs, schemas, runtime signals, or docs before changing anything.
-3. Plan the smallest correct change or recommendation.
-4. Implement or draft the concrete change inside the agent's allowed scope.
-5. Run relevant tests, linters, builds, static checks, queries, plans, screenshots, or exact verification commands.
-6. Analyze failures by root cause, not symptoms.
-7. Correct and repeat until there is concrete proof of success.
-
-Stop the loop when success is proven, when a real blocker is reached, or after 3 unsuccessful correction cycles. Never loop indefinitely. Preserve this agent's role, scope, sandbox limits, and domain-specific rules.
-
 Quality bar:
 - production-ready output with secure defaults and no hardcoded secrets
 - explicit edge-case handling where relevant

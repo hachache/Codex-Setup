@@ -12,9 +12,9 @@ L'objectif: cloner le depot, lancer un script, retrouver le meme workflow Codex 
 - **Reproductibilite**: `AGENTS.md`, agents TOML et skills sont versionnes et reinstallables.
 - **Securite**: aucun secret, auth, cache, session, memory ou plugin local n'est versionne.
 - **Qualite**: `validate.sh`, `doctor.sh`, ShellCheck, Gitleaks, checks whitespace et installation isolee.
-- **Routage intelligent**: Fast, Standard et Critical modes pour eviter de bruler du quota sur les petites taches.
-- **Boucles invocables**: `Fast loop`, `Standard loop` et `Critical loop` avec budgets de retry bornes.
-- **Pipeline critique**: orchestrator, implementer, reviewer, security, performance et gatekeeper seulement quand le risque le justifie.
+- **Defaut leger**: sans instruction de boucle, Codex garde son comportement normal.
+- **Boucles invocables**: seulement `loop fast` et `loop critical`, avec budgets de retry bornes.
+- **Pipeline critique**: orchestrator, implementer, reviewer, security, performance et gatekeeper seulement en `loop critical`.
 - **Release propre**: tag `v*`, archive `tar.gz`, checksum SHA-256 et GitHub Release automatique.
 
 ## Avant / apres
@@ -22,9 +22,9 @@ L'objectif: cloner le depot, lancer un script, retrouver le meme workflow Codex 
 | Situation | Avant | Apres |
 |---|---|---|
 | Nouveau Mac | Copier des prompts, agents et fichiers a la main | `git clone`, `./install.sh`, `./scripts/doctor.sh` |
-| Petites taches | Risque de lancer trop d'agents et trop de reasoning | Fast mode: direct, `medium`, validation ciblee |
-| Changement standard | Validation locale dependante de la discipline | Standard mode: tests/checks adaptes + revue legere |
-| Changement critique | Review manuelle et criteres implicites | Critical mode: pipeline auto-verifiant avec gate finale |
+| Petites taches | Risque de lancer trop d'agents et trop de reasoning | `loop fast`: direct, `medium`, validation ciblee |
+| Changement standard | Validation locale dependante de la discipline | Defaut Codex: workflow normal + verification adaptee |
+| Changement critique | Review manuelle et criteres implicites | `loop critical`: pipeline auto-verifiant avec gate finale |
 | Publication | Pas d'artefact versionne | Tag `v1.0.0` puis archive release + checksum |
 | Maintenance | Drift entre Mac de reference et depot | `sync-from-local.sh`, `validate.sh`, CI obligatoire |
 
@@ -32,9 +32,13 @@ L'objectif: cloner le depot, lancer un script, retrouver le meme workflow Codex 
 
 | Mode | Quand l'utiliser | Agents | Reasoning | Validation |
 |---|---|---|---|---|
-| Fast | README simple, copy edit, formatage, petit fix shell, changement trivial single-file | Aucun agent multiple sauf demande explicite | `medium` | Diff + commande ciblee si utile |
-| Standard | Feature normale, bug non trivial, refactor modere, script ou doc operatoire | Agent principal + specialiste unique si utile | `medium` ou agent adapte | Tests, lint, build, dry-run ou validation repo |
-| Critical | Securite, auth, secrets, CI/CD, prod, infra, DB, performance, gros refactor, architecture multi-fichiers | Orchestrator, implementation, review, security, perf, gatekeeper | `xhigh` si justifie | Quality gate complet, preuves et N/A explicites |
+| Defaut Codex | Aucune boucle nommee par l'utilisateur | Agent principal direct, subagent seulement si explicitement justifie | Le plus petit effort suffisant | Verification adaptee au diff et au risque |
+| `loop fast` | README simple, copy edit, formatage, petit fix shell, changement trivial single-file | Aucun agent multiple sauf demande explicite | `medium` | Diff + commande ciblee si utile |
+| `loop critical` | Securite, auth, secrets, CI/CD, prod, infra, DB, performance, gros refactor, architecture multi-fichiers | Orchestrator, implementation, review, security, perf, gatekeeper | `xhigh` si justifie | Quality gate complet, preuves et N/A explicites |
+
+Les agents specialises ne sont pas declenches par mot-cle seul. Ils entrent en jeu si l'utilisateur
+les nomme, si `loop critical` les requiert, ou si le risque technique justifie clairement un
+specialiste.
 
 ## Contenu
 

@@ -30,25 +30,6 @@ Quality checks:
 - ensure transitional architecture does not create unbounded complexity
 - call out proof-of-concept validations needed before broad rollout
 
-Technical depth:
-- Identify behavior invariants, public interfaces, coupling points, test coverage, and rollback boundaries before changing structure.
-- Separate pure refactor from feature changes; preserve runtime behavior, API contracts, persistence shape, and error semantics.
-- Prefer small mechanical steps, stable names, characterization tests, and compiler/type-system assistance where available.
-- Validate equivalence through targeted tests, diff review, static analysis, and before/after behavior checks.
-- Track remaining technical debt explicitly instead of widening the refactor opportunistically.
-
-Development loop:
-For implementation, debugging, review, documentation, or maintenance tasks, use this bounded iterative loop automatically:
-1. Define the goal, constraints, scope, and success criteria from the current role and user request.
-2. Inspect the relevant files, commands, configs, schemas, runtime signals, or docs before changing anything.
-3. Plan the smallest correct change or recommendation.
-4. Implement or draft the concrete change inside the agent's allowed scope.
-5. Run relevant tests, linters, builds, static checks, queries, plans, screenshots, or exact verification commands.
-6. Analyze failures by root cause, not symptoms.
-7. Correct and repeat until there is concrete proof of success.
-
-Stop the loop when success is proven, when a real blocker is reached, or after 3 unsuccessful correction cycles. Never loop indefinitely. Preserve this agent's role, scope, sandbox limits, and domain-specific rules.
-
 Quality bar:
 - production-ready output with secure defaults and no hardcoded secrets
 - explicit edge-case handling where relevant

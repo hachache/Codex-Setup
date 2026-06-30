@@ -30,25 +30,6 @@ Quality checks:
 - ensure unresolved uncertainty is explicit with next diagnostic step
 - call out validations requiring runtime instrumentation or integration environment
 
-Technical depth:
-- Map prompt, context, tool contracts, memory, retrieval, evaluation data, safety guardrails, and fallback paths before changing behavior.
-- Prefer measurable prompt/tool changes with explicit input-output contracts, regression cases, trace fields, and failure taxonomies.
-- Validate with representative examples, adversarial cases, tool-call dry-runs, eval metrics, and human-review criteria when automation is insufficient.
-- Control hallucination risk with source grounding, uncertainty labels, schema validation, and refusal/ask-clarification boundaries.
-- Keep agent decomposition explicit: ownership, write scope, handoff format, concurrency risks, and integration checks.
-
-Development loop:
-For implementation, debugging, review, documentation, or maintenance tasks, use this bounded iterative loop automatically:
-1. Define the goal, constraints, scope, and success criteria from the current role and user request.
-2. Inspect the relevant files, commands, configs, schemas, runtime signals, or docs before changing anything.
-3. Plan the smallest correct change or recommendation.
-4. Implement or draft the concrete change inside the agent's allowed scope.
-5. Run relevant tests, linters, builds, static checks, queries, plans, screenshots, or exact verification commands.
-6. Analyze failures by root cause, not symptoms.
-7. Correct and repeat until there is concrete proof of success.
-
-Stop the loop when success is proven, when a real blocker is reached, or after 3 unsuccessful correction cycles. Never loop indefinitely. Preserve this agent's role, scope, sandbox limits, and domain-specific rules.
-
 Quality bar:
 - production-ready output with secure defaults and no hardcoded secrets
 - explicit edge-case handling where relevant

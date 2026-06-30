@@ -36,31 +36,28 @@ require_contains() {
 
 require_grep '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" \
   "section pipeline auto-verifiant manquante dans AGENTS.md"
-require_grep "^## Mode d'execution par defaut$" "$ROOT_DIR/AGENTS.md" \
-  "section mode d'execution manquante dans AGENTS.md"
+require_grep "^## Mode par defaut$" "$ROOT_DIR/AGENTS.md" \
+  "section mode par defaut manquante dans AGENTS.md"
 require_grep '^## Efficacite contexte et tokens$' "$ROOT_DIR/AGENTS.md" \
   "section efficacite contexte/tokens manquante dans AGENTS.md"
-require_grep '^## Boucles invocables dans le chat$' "$ROOT_DIR/AGENTS.md" \
-  "section boucles invocables manquante dans AGENTS.md"
-require_grep '^### Fast mode$' "$ROOT_DIR/AGENTS.md" "Fast mode manquant dans AGENTS.md"
-require_grep '^### Standard mode$' "$ROOT_DIR/AGENTS.md" \
-  "Standard mode manquant dans AGENTS.md"
-require_grep '^### Critical mode$' "$ROOT_DIR/AGENTS.md" \
-  "Critical mode manquant dans AGENTS.md"
+require_grep '^## Loop fast$' "$ROOT_DIR/AGENTS.md" "loop fast manquante dans AGENTS.md"
+require_grep '^## Loop critical$' "$ROOT_DIR/AGENTS.md" "loop critical manquante dans AGENTS.md"
 require_contains 'Traiter le contexte comme un budget limite.' "$ROOT_DIR/AGENTS.md" \
   "budget contexte manquant dans AGENTS.md"
 require_contains 'La validation doit suivre le risque:' "$ROOT_DIR/AGENTS.md" \
   "validation par risque manquante dans AGENTS.md"
-require_contains 'Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.' \
-  "$ROOT_DIR/AGENTS.md" "boucle canonique manquante dans AGENTS.md"
+require_contains "Si l'utilisateur ne nomme pas \`loop fast\`, \`fast loop\`, \`boucle fast\`, \`loop critical\`," \
+  "$ROOT_DIR/AGENTS.md" "mode par defaut Codex manquant dans AGENTS.md"
+require_contains 'Escalader la verification par risque reel, sans activer `loop critical` implicitement.' \
+  "$ROOT_DIR/AGENTS.md" "loop critical implicite interdite dans AGENTS.md"
 require_contains 'Chaque retry doit etre justifie par une cause concrete' "$ROOT_DIR/AGENTS.md" \
   "retry par cause concrete manquant dans AGENTS.md"
 require_contains 'Ne jamais utiliser ' "$ROOT_DIR/AGENTS.md" \
   "interdiction xhigh faible risque manquante dans AGENTS.md"
 require_contains 'triviaux single-file.' "$ROOT_DIR/AGENTS.md" \
   "interdiction xhigh faible risque incomplete dans AGENTS.md"
-require_contains 'Uniquement en Critical mode, appliquer automatiquement ce pipeline.' \
-  "$ROOT_DIR/AGENTS.md" "pipeline complet doit etre limite au Critical mode dans AGENTS.md"
+require_contains 'Uniquement en `loop critical`, appliquer automatiquement ce pipeline.' \
+  "$ROOT_DIR/AGENTS.md" "pipeline complet doit etre limite a loop critical dans AGENTS.md"
 require_contains '[Efficacite contexte et tokens](docs/context-efficiency.md)' "$ROOT_DIR/README.md" \
   "README doit referencer la documentation efficacite contexte/tokens"
 require_grep 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" \
@@ -71,20 +68,20 @@ require_contains 'Toujours choisir le plus petit workflow qui donne assez de con
   "$ROOT_DIR/docs/context-efficiency.md" "principe efficacite manquant dans la documentation"
 require_contains '## Invocation dans le chat' "$ROOT_DIR/docs/context-efficiency.md" \
   "invocation chat manquante dans la documentation"
-require_contains 'Fast loop' "$ROOT_DIR/docs/context-efficiency.md" \
-  "Fast loop manquante dans la documentation"
+require_contains '`loop fast`' "$ROOT_DIR/docs/context-efficiency.md" \
+  "loop fast manquante dans la documentation"
+require_contains '`loop critical`' "$ROOT_DIR/docs/context-efficiency.md" \
+  "loop critical manquante dans la documentation"
 require_contains 'Ne jamais relancer une validation echouee sans avoir change la cause pertinente.' \
   "$ROOT_DIR/docs/context-efficiency.md" "no blind retry manquant dans la documentation"
 require_contains 'residual_risks:' "$ROOT_DIR/docs/context-efficiency.md" \
   "evidence ledger manquant dans la documentation"
-require_grep '^### Fast mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
-  "Fast mode manquant dans la documentation pipeline"
-require_grep '^### Standard mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
-  "Standard mode manquant dans la documentation pipeline"
-require_grep '^### Critical mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
-  "Critical mode manquant dans la documentation pipeline"
-require_contains 'Le workflow auto-verifiant est reserve au Critical mode.' "$ROOT_DIR/docs/agents.md" \
-  "documentation agents doit limiter le pipeline au Critical mode"
+require_grep '^### Loop fast$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "loop fast manquante dans la documentation pipeline"
+require_grep '^### Loop critical$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "loop critical manquante dans la documentation pipeline"
+require_contains 'Le workflow auto-verifiant est reserve a `loop critical`.' "$ROOT_DIR/docs/agents.md" \
+  "documentation agents doit limiter le pipeline a loop critical"
 require_contains "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" \
   "$ROOT_DIR/AGENTS.md" "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
 require_contains "writer: \`@implementation-engineer\` as accountable owner" \
@@ -143,12 +140,12 @@ for file in "$ROOT_DIR"/agents/*.toml; do
       missing=1
       ;;
   esac
-  if ! grep -q '^Technical depth:$' "$file"; then
-    printf 'missing Technical depth block: %s\n' "$file" >&2
+  if grep -q '^Technical depth:$' "$file"; then
+    printf 'obsolete Technical depth block: %s\n' "$file" >&2
     missing=1
   fi
-  if ! grep -q '^Development loop:$' "$file"; then
-    printf 'missing Development loop block: %s\n' "$file" >&2
+  if grep -q '^Development loop:$' "$file"; then
+    printf 'obsolete Development loop block: %s\n' "$file" >&2
     missing=1
   fi
 done
@@ -209,15 +206,9 @@ for path in sorted((root / "agents").glob("*.toml")):
     if data["model_reasoning_effort"] not in {"medium", "xhigh"}:
         raise SystemExit(f"{path}: model_reasoning_effort invalide: {data['model_reasoning_effort']}")
     instructions = data["developer_instructions"]
-    for section in ("Technical depth:", "Development loop:"):
-        if section not in instructions:
-            raise SystemExit(f"{path}: section manquante dans developer_instructions: {section}")
-    technical = instructions.split("Technical depth:", 1)[1].split("Development loop:", 1)[0]
-    loop = instructions.split("Development loop:", 1)[1]
-    if technical.count("\n- ") < 3:
-        raise SystemExit(f"{path}: section Technical depth trop faible")
-    if "3 unsuccessful correction cycles" not in loop:
-        raise SystemExit(f"{path}: boucle de developpement non bornee")
+    for obsolete in ("Technical depth:", "Development loop:"):
+        if obsolete in instructions:
+            raise SystemExit(f"{path}: section obsolete dans developer_instructions: {obsolete}")
     if data["name"] in pipeline_agents:
         return_block = instructions.rsplit("Return:", 1)[-1]
         if "gate_report" not in return_block:

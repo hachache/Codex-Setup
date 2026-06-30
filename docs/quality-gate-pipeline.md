@@ -1,6 +1,7 @@
 # Pipeline auto-verifiant
 
-Ce workflow transforme les agents Codex en pipeline de revue automatique pour les taches a fort risque. Il est reserve au Critical mode.
+Ce workflow transforme les agents Codex en pipeline de revue automatique pour les taches a fort
+risque. Il est reserve a `loop critical`.
 
 ## Objectif
 
@@ -25,29 +26,27 @@ Le resultat attendu n'est pas seulement une reponse utile. Le resultat attendu e
 
 ## Declenchement
 
-Choisir d'abord le mode d'execution le moins cher qui donne assez de confiance.
+Par defaut, Codex ne lance pas ce pipeline. Il s'active seulement quand l'utilisateur demande
+`loop critical`, `critical loop` ou `boucle critical`, ou quand une `loop fast` demandee serait trop
+faible pour une tache critique.
 
-### Fast mode
+### Mode par defaut
 
-Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de texte, petit script, fix shell localise ou changement trivial dans un seul fichier.
+Utiliser le comportement Codex normal: inspecter ce qui est utile, implementer, verifier avec les
+commandes adaptees, puis repondre. Pas de `gate_report` impose.
+
+### Loop fast
+
+Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de
+texte, petit script, fix shell localise ou changement trivial dans un seul fichier.
 
 - reasoning `medium`;
 - pas de pipeline complet;
-- pas d'agents multiples;
+- pas d'agents multiples sauf demande explicite;
 - validation minimale ciblee;
 - jamais `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
 
-### Standard mode
-
-Utiliser pour le developpement normal: feature classique, bug non trivial, refactor modere, documentation operatoire, script ou tooling avec effet reel.
-
-- agent principal direct;
-- specialiste unique si le domaine le justifie;
-- tests, linters, builds, dry-runs ou validations adaptees au diff;
-- revue legere si le risque correctness ou maintenance est plausible;
-- quality gate simplifiee avec preuves, commandes, risques residuels et N/A.
-
-### Critical mode
+### Loop critical
 
 Utiliser ce pipeline uniquement pour les changements a fort risque qui modifient ou analysent:
 
@@ -55,10 +54,10 @@ Utiliser ce pipeline uniquement pour les changements a fort risque qui modifient
 - scripts et tooling;
 - agents, prompts, instructions ou workflows;
 - infrastructure, CI/CD, Docker, Kubernetes, Terraform, Ansible;
-- documentation operatoire ou procedures mainteneur;
+- documentation operatoire ou procedures mainteneur critiques;
 - dependances, configuration, permissions, auth, secrets, donnees ou exposition reseau.
 
-Le pipeline complet ne doit pas tourner en Fast ou Standard sauf escalade explicite par risque concret.
+Le pipeline complet ne doit pas tourner en mode par defaut ou en `loop fast`.
 
 ## Contrat d'execution
 

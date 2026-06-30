@@ -1,7 +1,7 @@
 # Efficacite contexte et tokens
 
 Cette policy reduit le cout, la latence et le bruit sans baisser le niveau de qualite attendu. Elle
-complete les modes Fast, Standard et Critical.
+complete le mode par defaut Codex avec deux boucles explicites: `loop fast` et `loop critical`.
 
 ## Principe
 
@@ -11,21 +11,24 @@ Ne pas escalader par mot-cle seul. Escalader quand la tache touche une surface s
 comportement difficile a verifier, un impact production, une migration, la securite, la performance,
 l'infra ou une architecture multi-fichiers.
 
+Sans invocation de boucle, rester en comportement Codex normal: lire ce qui est utile, modifier, verifier
+de facon adaptee, puis repondre.
+
 ## Matrice
 
-Fast:
+Defaut Codex:
+- Scope: toute tache sans boucle explicitement nommee.
+- Contexte: fichiers utiles au changement.
+- Agents: aucun subagent par defaut, sauf demande explicite ou besoin specialiste justifie.
+- Validation: commandes adaptees au diff et au risque.
+
+`loop fast`:
 - Scope: petites edits, formatage, docs simples, commentaires, renommage, boilerplate, petit bug fix.
 - Contexte: bloc pertinent.
-- Agents: aucun agent multiple.
+- Agents: aucun agent multiple sauf demande explicite.
 - Validation: diff et commande ciblee.
 
-Standard:
-- Scope: feature normale, refactor modere, multi-file coherent, tests, API work, tooling.
-- Contexte: fichiers lies au flux.
-- Agents: agent principal et specialiste unique si utile.
-- Validation: tests, lint, build ou dry-run.
-
-Critical:
+`loop critical`:
 - Scope: securite, auth, secrets, infra, DB migration, performance, CI/CD, architecture large.
 - Contexte: contexte borne au risque.
 - Agents: pipeline auto-verifiant.
@@ -50,36 +53,35 @@ Critical:
   decisions d'architecture et le travail restant.
 - Arreter quand les exigences sont satisfaites, les validations adaptees passent et la confiance est suffisante.
 
-## Boucles
+## Boucles explicites
 
-Boucle canonique:
+Les boucles ne s'activent que si l'utilisateur les nomme, ou si une fast loop demandee est
+manifestement insuffisante pour une tache critique.
+
+Boucle canonique de `loop critical`:
 
 ```text
 inspecter -> implementer -> verifier -> reviewer -> corriger -> gate
 ```
 
-Toujours utiliser la plus petite boucle bornee qui peut prouver la reussite.
-
 | Boucle | Budget | Gate | Ledger |
 |---|---|---|---|
-| Fast loop | 1 passe, 0 a 1 correction | verification ciblee | non requis |
-| Standard loop | 1 a 2 cycles de correction | revue legere + validations adaptees | leger |
-| Critical loop | jusqu'a 3 cycles de correction | pipeline auto-verifiant complet | obligatoire |
+| `loop fast` | 1 passe, 0 a 1 correction | verification ciblee | non requis |
+| `loop critical` | jusqu'a 3 cycles de correction | pipeline auto-verifiant complet | obligatoire |
 
 ## Invocation dans le chat
 
 L'utilisateur peut forcer une boucle en disant:
 
-- `Fast loop` ou `boucle fast`;
-- `Standard loop` ou `boucle standard`;
-- `Critical loop` ou `boucle critical`.
+- `loop fast`, `Fast loop` ou `boucle fast`;
+- `loop critical`, `Critical loop` ou `boucle critical`.
 
 Regles:
 
 - Si la boucle demandee est suffisante pour le risque, l'utiliser explicitement.
-- Si la boucle demandee est trop faible pour le risque, escalader et expliquer brievement la raison.
-- Si `Critical loop` est invoquee, appliquer le pipeline auto-verifiant complet.
-- Si aucune boucle n'est nommee, choisir automatiquement Fast, Standard ou Critical selon le risque.
+- Si `loop fast` est trop faible pour le risque, utiliser `loop critical` et expliquer brievement la raison.
+- Si `loop critical` est invoquee, appliquer le pipeline auto-verifiant complet.
+- Si aucune boucle n'est nommee, rester en comportement Codex normal.
 
 ## Retry policy
 
@@ -106,15 +108,14 @@ test failed -> cause racine -> patch cible -> retry
 
 Ne jamais relancer une validation echouee sans avoir change la cause pertinente.
 
-Arreter la boucle quand la reussite est prouvee, quand le risque residuel est acceptable pour le mode
-choisi, quand un vrai blocage existe, ou quand le budget de retry est epuise. Ne jamais boucler
-indefiniment.
+Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou quand le budget de
+retry est epuise. Ne jamais boucler indefiniment.
 
 ## Evidence ledger
 
-Fast mode n'a pas besoin d'un ledger si le diff et le check cible suffisent.
+`loop fast` n'a pas besoin d'un ledger si le diff et le check cible suffisent.
 
-Standard et Critical gardent un ledger court:
+`loop critical` garde un ledger court:
 
 ```text
 changed:
@@ -128,9 +129,9 @@ residual_risks:
 
 Utiliser le plus petit effort de raisonnement suffisant:
 
-- Fast: `medium`;
-- Standard: `medium` ou effort de l'agent specialiste choisi;
-- Critical: `xhigh` quand le risque le justifie.
+- Defaut Codex: effort normal, sans escalation automatique.
+- `loop fast`: `medium`;
+- `loop critical`: `xhigh` quand le risque le justifie.
 
 Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements
 triviaux single-file.

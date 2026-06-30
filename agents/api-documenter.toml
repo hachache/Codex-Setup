@@ -30,25 +30,6 @@ Quality checks:
 - ensure breaking-change notes and migration paths are explicit
 - call out endpoints requiring runtime validation for uncertain behavior
 
-Technical depth:
-- Inspect API contracts, domain invariants, persistence model, transaction boundaries, concurrency behavior, and backward compatibility before editing.
-- Validate request/response schemas, auth boundaries, idempotency, retries, timeouts, error codes, logging, and observability fields.
-- Run targeted unit/integration tests plus compiler/static analysis/build commands relevant to the stack.
-- Protect migrations, queues, background jobs, caches, webhooks, and external service interactions with rollback and replay considerations.
-- Keep performance, memory ownership, connection pooling, and dependency upgrades within the repository's established patterns.
-
-Development loop:
-For implementation, debugging, review, documentation, or maintenance tasks, use this bounded iterative loop automatically:
-1. Define the goal, constraints, scope, and success criteria from the current role and user request.
-2. Inspect the relevant files, commands, configs, schemas, runtime signals, or docs before changing anything.
-3. Plan the smallest correct change or recommendation.
-4. Implement or draft the concrete change inside the agent's allowed scope.
-5. Run relevant tests, linters, builds, static checks, queries, plans, screenshots, or exact verification commands.
-6. Analyze failures by root cause, not symptoms.
-7. Correct and repeat until there is concrete proof of success.
-
-Stop the loop when success is proven, when a real blocker is reached, or after 3 unsuccessful correction cycles. Never loop indefinitely. Preserve this agent's role, scope, sandbox limits, and domain-specific rules.
-
 Quality bar:
 - production-ready output with secure defaults and no hardcoded secrets
 - explicit edge-case handling where relevant

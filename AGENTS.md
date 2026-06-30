@@ -45,76 +45,50 @@
 - Utiliser `apply_patch` pour les edits manuels.
 - Verifier apres modification avec les commandes adaptees.
 
-## Boucle de developpement automatique
+## Mode par defaut
 
-Pour toute tache de code, debug, documentation, infra ou maintenance, utiliser la plus petite boucle
-bornee qui peut prouver la reussite.
+Si l'utilisateur ne nomme pas `loop fast`, `fast loop`, `boucle fast`, `loop critical`,
+`critical loop` ou `boucle critical`, utiliser le comportement Codex normal.
 
-Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.
+- Pas de boucle nommee ni evidence ledger impose.
+- Pas de pipeline auto-verifiant.
+- Pas de subagent par defaut; utiliser un subagent seulement si l'utilisateur le nomme ou si le risque
+  impose explicitement un specialiste.
+- Choisir le minimum de contexte, d'edits et de validations qui prouve la reussite.
+- Escalader la verification par risque reel, sans activer `loop critical` implicitement.
 
-Budgets:
+## Loop fast
 
-- Fast loop: 1 passe, 0 a 1 correction, verification ciblee.
-- Standard loop: 1 a 2 cycles de correction, tests/checks adaptes, revue legere.
-- Critical loop: pipeline complet avec jusqu'a 3 cycles de correction, gate finale obligatoire.
+Invocations: `loop fast`, `fast loop`, `boucle fast`.
 
-Chaque retry doit etre justifie par une cause concrete: test casse, linter/format, comportement
-incorrect, manque de preuve, risque securite/performance ou ambiguite utilisateur. Ne jamais relancer
-une validation echouee sans avoir change la cause pertinente.
-
-Arreter la boucle quand la reussite est prouvee, quand le risque residuel est acceptable pour le mode
-choisi, quand un vrai blocage existe, ou quand le budget de retry est epuise. Ne jamais boucler
-indefiniment.
-
-## Mode d'execution par defaut
-
-Toujours choisir le workflow le moins cher qui donne une confiance suffisante. Escalader seulement
-quand le risque le justifie.
-
-### Fast mode
-
-Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de
-texte, petit script, fix shell localise, changement trivial dans un seul fichier.
+Utiliser seulement pour les petites taches a faible risque: formatage, README simple, copy edit,
+correction de texte, petit script, fix shell localise, changement trivial dans un seul fichier.
 
 - reasoning `medium`;
 - pas de pipeline complet;
-- pas d'agents multiples;
+- pas d'agents multiples sauf `@agent-name` explicite;
+- 1 passe, 0 a 1 correction;
 - validation minimale ciblee: lecture du fichier, diff, commande locale pertinente si elle existe;
-- objectif: vitesse, cout bas et preuve suffisante.
+- sortie courte: changement effectue, verification, risque residuel si utile.
 
 Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements
 triviaux single-file.
 
-### Standard mode
+Si `loop fast` est demande sur une tache a fort risque, refuser la fast loop, utiliser `loop critical`
+et expliquer brievement pourquoi.
 
-Utiliser pour le developpement normal: feature classique, bug non trivial, refactor modere,
-documentation operatoire, script ou tooling avec effet reel.
+## Loop critical
 
-- agent principal direct;
-- specialiste unique si le domaine le justifie;
-- tests, linters, builds, dry-runs ou validations adaptees au diff;
-- revue legere si le risque correctness ou maintenance est plausible;
-- quality gate simplifiee: commandes passees, preuves, risques residuels et N/A explicites.
-
-### Critical mode
+Invocations: `loop critical`, `critical loop`, `boucle critical`.
 
 Utiliser seulement pour les changements a fort risque: securite, auth, secrets, permissions, CI/CD,
 production, infrastructure, Docker, Kubernetes, Terraform, Ansible, migration DB, perte de donnees,
 performance, scalabilite, cout, gros refactor ou architecture multi-fichiers.
 
-Critical mode active le pipeline auto-verifiant complet.
+`loop critical` active le pipeline auto-verifiant complet avec jusqu'a 3 cycles de correction, gate
+finale obligatoire et preuves explicites.
 
-## Boucles invocables dans le chat
-
-L'utilisateur peut forcer une boucle en disant `Fast loop`, `Standard loop`, `Critical loop`,
-`boucle fast`, `boucle standard` ou `boucle critical`.
-
-- Si la boucle demandee est suffisante pour le risque, l'utiliser explicitement.
-- Si la boucle demandee est trop faible pour le risque, escalader et expliquer brievement la raison.
-- Si `Critical loop` est invoquee, appliquer le pipeline auto-verifiant complet.
-- Si aucune boucle n'est nommee, choisir automatiquement Fast, Standard ou Critical selon le risque.
-
-Pour Standard et Critical, tenir un evidence ledger leger:
+Tenir un evidence ledger leger:
 
 ```text
 changed:
@@ -123,6 +97,13 @@ failures:
 fixes:
 residual_risks:
 ```
+
+Chaque retry doit etre justifie par une cause concrete: test casse, linter/format, comportement
+incorrect, manque de preuve, risque securite/performance ou ambiguite utilisateur. Ne jamais relancer
+une validation echouee sans avoir change la cause pertinente.
+
+Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou quand le budget de
+retry est epuise. Ne jamais boucler indefiniment.
 
 ## Efficacite contexte et tokens
 
@@ -137,9 +118,9 @@ d'agents, de latence et de raisonnement necessaires.
   sauf necessite explicite.
 - Preferer logs, stack traces, code, markdown et sorties terminal aux screenshots quand le texte suffit.
 - Grouper implementation, verification, revue legere et correction dans le meme passage quand c'est coherent.
-- Limiter les boucles de revue: implementation, review, correction, final review. Par defaut,
-  maximum 2 cycles de correction; Critical peut aller jusqu'au plafond de 3 cycles si un bloqueur
-  concret le justifie.
+- Ne pas lancer de boucle nommee si l'utilisateur ne l'a pas demandee.
+- Limiter les boucles de revue: implementation, review, correction, final review. `loop critical`
+  peut aller jusqu'au plafond de 3 cycles si un bloqueur concret le justifie.
 - Compresser mentalement le contexte obsolete: garder objectif courant, contraintes, decisions
   d'architecture et travail restant.
 - Finir, verifier, puis expliquer. Eviter les longues discussions de plan pour les taches simples.
@@ -147,14 +128,14 @@ d'agents, de latence et de raisonnement necessaires.
 
 La validation doit suivre le risque:
 
-- Fast: diff et verification ciblee seulement.
-- Standard: tests, linters, builds, dry-runs ou validation repo adaptee.
-- Critical: quality gate complet avec preuves et N/A explicites.
+- Defaut Codex: verification adaptee au diff et au risque, sans pipeline impose.
+- `loop fast`: diff et verification ciblee seulement.
+- `loop critical`: quality gate complet avec preuves et N/A explicites.
 
 ## Pipeline auto-verifiant
 
-Uniquement en Critical mode, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet
-en Fast ou Standard sauf escalade explicite par risque concret.
+Uniquement en `loop critical`, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet
+en mode par defaut ou en `loop fast`.
 
 1. `@engineering-pipeline-orchestrator`: definir le perimetre, les criteres de succes, les agents,
    les validations et les N/A acceptables.
@@ -181,16 +162,23 @@ sans relancer les etapes impactees.
 
 ## Routage subagents
 
-- Choisir d'abord le mode d'execution: Fast, Standard ou Critical.
-- Fast mode: traiter directement, sauf demande explicite `@agent-name`.
-- Standard mode: utiliser au plus un agent specialiste si le domaine le justifie.
-- Critical mode: utiliser les agents requis par le pipeline auto-verifiant.
+- Mode par defaut: traiter directement sauf demande explicite `@agent-name` ou besoin specialiste
+  vraiment justifie.
+- `loop fast`: traiter directement, sauf demande explicite `@agent-name`.
+- `loop critical`: utiliser les agents requis par le pipeline auto-verifiant.
+- Les agents specialises ne sont jamais declenches par mot-cle seul: `React`, `Kubernetes` ou
+  `Terraform` ne suffit pas a lancer un subagent.
+- Utiliser un agent specialise seulement si l'utilisateur le nomme, si `loop critical` l'exige, ou
+  si le risque technique justifie clairement une expertise dediee.
 - Si plusieurs agents correspondent, choisir le plus specifique compatible avec le mode.
 - Si aucun agent ne correspond clairement, traiter directement.
 - Si l'utilisateur nomme un agent avec `@agent-name`, utiliser cet agent.
 - Ne pas demander quel agent utiliser sauf ambiguite risquee.
 
-## Routage par defaut
+## Routage explicite par domaine
+
+Utiliser cette table seulement quand un subagent est explicitement demande ou justifie par le mode
+selectionne.
 
 - Shell, Bash, Zsh, POSIX: `@shell-specialist`
 - Python, FastAPI, pytest, packaging, typing: `@python-pro` ou `@python-specialist`
@@ -220,4 +208,4 @@ sans relancer les etapes impactees.
 
 ## Regle finale
 
-Use subagents only when the selected execution mode justifies them.
+Use subagents only when the selected execution mode justifies them or the user explicitly names one.

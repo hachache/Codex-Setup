@@ -33,7 +33,8 @@ Valeurs autorisees pour les agents:
 - `medium`
 - `xhigh`
 
-La valeur `xhigh` est l'equivalent technique du mode "very high" dans ce setup. Ne pas utiliser `high`: les agents qui etaient en `high` doivent rester en `xhigh`.
+La valeur `xhigh` est l'equivalent technique du mode "very high" dans ce setup. Ne pas utiliser
+`high`: les agents qui etaient en `high` doivent rester en `xhigh`.
 
 Politique locale:
 
@@ -43,29 +44,30 @@ Politique locale:
 
 Politique d'execution:
 
-- Fast mode utilise `medium` et traite directement les petites taches a faible risque.
-- Standard mode peut utiliser un seul agent specialiste quand le domaine le justifie.
-- Critical mode active les agents de pipeline et les agents `xhigh` quand le risque le justifie.
+- Par defaut, Codex traite directement sans boucle nommee.
+- `loop fast` utilise `medium` et traite directement les petites taches a faible risque.
+- `loop critical` active les agents de pipeline et les agents `xhigh` quand le risque le justifie.
+- Les agents specialises ne se declenchent pas par mot-cle seul. Ils sont utilises si l'utilisateur
+  les nomme, si `loop critical` les requiert, ou si le risque technique justifie clairement un
+  specialiste.
 - Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
 - Preferer le workflow le moins cher qui donne assez de confiance.
 
-## Blocs obligatoires
+## Instructions d'agent
 
-Chaque agent doit contenir:
+Chaque agent doit rester centre sur son domaine:
 
-- `Technical depth:` avec les controles techniques adaptes a sa famille;
-- `Development loop:` avec la boucle inspecter, planifier, implementer, verifier, corriger.
+- mission claire;
+- conditions d'utilisation;
+- working mode court;
+- controles qualite propres au stack;
+- format de retour utile au parent agent.
 
-La boucle est bornee: arret quand la reussite est prouvee, quand un vrai blocage est atteint, ou apres 3 cycles de correction infructueux.
+Ne pas injecter de boucle generique dans tous les agents. Les boucles sont centralisees dans
+`AGENTS.md`:
 
-Ce pattern suit les pratiques publiques Claude Code: explorer/planifier avant implementation, prouver avec des sorties de commandes ou captures, et utiliser des hooks/subagents pour verifier quand c'est pertinent.
-
-References publiques:
-
-- [Codex config reference](https://developers.openai.com/codex/config-reference)
-- [Claude Code common workflows](https://docs.anthropic.com/en/docs/claude-code/common-workflows)
-- [Claude Code hooks guide](https://docs.anthropic.com/en/docs/claude-code/hooks-guide)
-- [Claude Code best practices](https://www.anthropic.com/engineering/claude-code-best-practices)
+- `loop fast`: boucle courte, directe, sans pipeline;
+- `loop critical`: pipeline auto-verifiant complet.
 
 Le nom du fichier doit correspondre a `name`:
 
@@ -90,7 +92,7 @@ Ils evitent que `AGENTS.md` reference un agent absent sur un nouveau Mac.
 
 ## Agents de pipeline
 
-Le workflow auto-verifiant est reserve au Critical mode. Il repose sur ces agents dedies:
+Le workflow auto-verifiant est reserve a `loop critical`. Il repose sur ces agents dedies:
 
 - `engineering-pipeline-orchestrator`: definit le pipeline, les agents requis, les validations et les N/A acceptables.
 - `implementation-engineer`: owner de l'etape d'implementation et du `gate_report` writer; les specialistes stack peuvent rester en support.
@@ -127,6 +129,6 @@ La validation controle:
 - presence des champs TOML obligatoires;
 - coherence `filename == name`;
 - parsing TOML obligatoire via `tomllib` ou `tomli`;
-- presence et contenu minimal des blocs `Technical depth:` et `Development loop:`;
+- absence d'effort `high`, au profit de `medium` ou `xhigh`;
 - presence des agents et de la documentation du pipeline auto-verifiant;
 - scan basique de secrets si `rg` est disponible.

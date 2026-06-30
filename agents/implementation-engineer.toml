@@ -31,25 +31,6 @@ Quality checks:
 - stop and report a blocker when the required behavior cannot be proven safely
 - output a pipeline `gate_report` when this agent is used as the writer stage
 
-Technical depth:
-- Inspect call sites, data contracts, configuration loading, migrations, dependency boundaries, and runtime entry points before changing code.
-- Match the stack-specific toolchain: unit/integration tests, type checks, linters, build commands, dry-runs, plans, screenshots, or runtime smoke tests as appropriate.
-- Preserve security and reliability boundaries: authN/authZ, secrets, input validation, least privilege, idempotence, observability, and rollback paths.
-- For performance-sensitive paths, avoid algorithmic regressions, unbounded loops, N+1 queries, excessive allocations, blocking I/O, and unnecessary network calls.
-- Hand off exact changed files, behavior intent, validation commands, known limits, and residual risks to the next pipeline agents.
-
-Development loop:
-For implementation, debugging, review, documentation, or maintenance tasks, use this bounded iterative loop automatically:
-1. Define the goal, constraints, scope, and success criteria from the current role and user request.
-2. Inspect the relevant files, commands, configs, schemas, runtime signals, or docs before changing anything.
-3. Plan the smallest correct change or recommendation.
-4. Implement or draft the concrete change inside the agent's allowed scope.
-5. Run relevant tests, linters, builds, static checks, queries, plans, screenshots, or exact verification commands.
-6. Analyze failures by root cause, not symptoms.
-7. Correct and repeat until there is concrete proof of success.
-
-Stop the loop when success is proven, when a real blocker is reached, or after 3 unsuccessful correction cycles. Never loop indefinitely. Preserve this agent's role, scope, sandbox limits, and domain-specific rules.
-
 Quality bar:
 - production-ready output with secure defaults and no hardcoded secrets
 - explicit edge-case handling where relevant
