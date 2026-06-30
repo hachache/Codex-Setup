@@ -57,11 +57,11 @@ require_contains 'La validation doit suivre le risque:' "$ROOT_DIR/AGENTS.md" \
   "validation par risque manquante dans AGENTS.md"
 require_contains 'Est-ce que la stdlib, le shell, le framework ou le langage le fait deja ?' \
   "$ROOT_DIR/AGENTS.md" "rung stdlib manquant dans AGENTS.md"
-require_contains 'Marquer les simplifications volontaires avec `lean:`' "$ROOT_DIR/AGENTS.md" \
+require_contains "Marquer les simplifications volontaires avec \`lean:\`" "$ROOT_DIR/AGENTS.md" \
   "convention lean manquante dans AGENTS.md"
 require_contains "Si l'utilisateur ne nomme pas \`loop fast\`, \`fast loop\`, \`boucle fast\`, \`loop critical\`," \
   "$ROOT_DIR/AGENTS.md" "mode par defaut Codex manquant dans AGENTS.md"
-require_contains 'Escalader la verification par risque reel, sans activer `loop critical` implicitement.' \
+require_contains "Escalader la verification par risque reel, sans activer \`loop critical\` implicitement." \
   "$ROOT_DIR/AGENTS.md" "loop critical implicite interdite dans AGENTS.md"
 require_contains 'Chaque retry doit etre justifie par une cause concrete' "$ROOT_DIR/AGENTS.md" \
   "retry par cause concrete manquant dans AGENTS.md"
@@ -69,7 +69,7 @@ require_contains 'Ne jamais utiliser ' "$ROOT_DIR/AGENTS.md" \
   "interdiction xhigh faible risque manquante dans AGENTS.md"
 require_contains 'triviaux single-file.' "$ROOT_DIR/AGENTS.md" \
   "interdiction xhigh faible risque incomplete dans AGENTS.md"
-require_contains 'Uniquement en `loop critical`, appliquer automatiquement ce pipeline.' \
+require_contains "Uniquement en \`loop critical\`, appliquer automatiquement ce pipeline." \
   "$ROOT_DIR/AGENTS.md" "pipeline complet doit etre limite a loop critical dans AGENTS.md"
 require_contains '[Efficacite contexte et tokens](docs/context-efficiency.md)' "$ROOT_DIR/README.md" \
   "README doit referencer la documentation efficacite contexte/tokens"
@@ -77,9 +77,9 @@ require_contains '[Workflow Lean Codex](docs/lean-workflow.md)' "$ROOT_DIR/READM
   "README doit referencer la documentation workflow Lean"
 require_contains '[Alternatives natives et stdlib](docs/native-platform-alternatives.md)' "$ROOT_DIR/README.md" \
   "README doit referencer la documentation alternatives natives"
-require_contains '$lean-review' "$ROOT_DIR/README.md" "README doit documenter lean-review"
-require_contains '$lean-audit' "$ROOT_DIR/README.md" "README doit documenter lean-audit"
-require_contains '$lean-debt' "$ROOT_DIR/README.md" "README doit documenter lean-debt"
+require_contains "\$lean-review" "$ROOT_DIR/README.md" "README doit documenter lean-review"
+require_contains "\$lean-audit" "$ROOT_DIR/README.md" "README doit documenter lean-audit"
+require_contains "\$lean-debt" "$ROOT_DIR/README.md" "README doit documenter lean-debt"
 require_grep 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" \
   "documentation des agents de pipeline manquante"
 require_grep 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
@@ -90,9 +90,9 @@ require_contains 'Appliquer le ladder Lean avant d'\''ajouter code, dependance o
   "$ROOT_DIR/docs/context-efficiency.md" "ladder Lean manquant dans la documentation efficacite"
 require_contains '## Invocation dans le chat' "$ROOT_DIR/docs/context-efficiency.md" \
   "invocation chat manquante dans la documentation"
-require_contains '`loop fast`' "$ROOT_DIR/docs/context-efficiency.md" \
+require_contains "\`loop fast\`" "$ROOT_DIR/docs/context-efficiency.md" \
   "loop fast manquante dans la documentation"
-require_contains '`loop critical`' "$ROOT_DIR/docs/context-efficiency.md" \
+require_contains "\`loop critical\`" "$ROOT_DIR/docs/context-efficiency.md" \
   "loop critical manquante dans la documentation"
 require_contains 'Ne jamais relancer une validation echouee sans avoir change la cause pertinente.' \
   "$ROOT_DIR/docs/context-efficiency.md" "no blind retry manquant dans la documentation"
@@ -102,19 +102,19 @@ require_grep '^### Loop fast$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
   "loop fast manquante dans la documentation pipeline"
 require_grep '^### Loop critical$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
   "loop critical manquante dans la documentation pipeline"
-require_contains 'Le workflow auto-verifiant est reserve a `loop critical`.' "$ROOT_DIR/docs/agents.md" \
+require_contains "Le workflow auto-verifiant est reserve a \`loop critical\`." "$ROOT_DIR/docs/agents.md" \
   "documentation agents doit limiter le pipeline a loop critical"
-require_contains 'Les skills Lean (`lean-review`, `lean-audit`, `lean-debt`) sont des outils de simplification' \
+require_contains "Les skills Lean (\`lean-review\`, \`lean-audit\`, \`lean-debt\`) sont des outils de simplification" \
   "$ROOT_DIR/docs/agents.md" "documentation agents doit mentionner les skills Lean"
 require_contains 'Ce workflow reprend le meilleur de Ponytail sans reprendre son cout permanent' \
   "$ROOT_DIR/docs/lean-workflow.md" "positionnement Lean manquant"
-require_contains '$lean-review' "$ROOT_DIR/docs/lean-workflow.md" \
+require_contains "\$lean-review" "$ROOT_DIR/docs/lean-workflow.md" \
   "documentation lean-review manquante"
 require_contains 'Verifier ces alternatives avant d'\''ajouter une dependance' \
   "$ROOT_DIR/docs/native-platform-alternatives.md" "principe alternatives natives manquant"
-require_contains '`lean-review`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-review"
-require_contains '`lean-audit`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-audit"
-require_contains '`lean-debt`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-debt"
+require_contains "\`lean-review\`" "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-review"
+require_contains "\`lean-audit\`" "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-audit"
+require_contains "\`lean-debt\`" "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-debt"
 require_contains "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" \
   "$ROOT_DIR/AGENTS.md" "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
 require_contains "writer: \`@implementation-engineer\` as accountable owner" \
