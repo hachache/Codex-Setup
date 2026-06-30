@@ -56,4 +56,3 @@ Utiliser le plus petit effort de raisonnement suffisant:
 - Critical: `xhigh` quand le risque le justifie.
 
 Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
-
