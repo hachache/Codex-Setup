@@ -59,9 +59,41 @@ Pour toute tache de code, debug, documentation, infra ou maintenance:
 
 Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou apres 3 cycles de correction infructueux. Ne jamais boucler indefiniment.
 
+## Mode d'execution par defaut
+
+Toujours choisir le workflow le moins cher qui donne une confiance suffisante. Escalader seulement quand le risque le justifie.
+
+### Fast mode
+
+Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de texte, petit script, fix shell localise, changement trivial dans un seul fichier.
+
+- reasoning `medium`;
+- pas de pipeline complet;
+- pas d'agents multiples;
+- validation minimale ciblee: lecture du fichier, diff, commande locale pertinente si elle existe;
+- objectif: vitesse, cout bas et preuve suffisante.
+
+Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
+
+### Standard mode
+
+Utiliser pour le developpement normal: feature classique, bug non trivial, refactor modere, documentation operatoire, script ou tooling avec effet reel.
+
+- agent principal direct;
+- specialiste unique si le domaine le justifie;
+- tests, linters, builds, dry-runs ou validations adaptees au diff;
+- revue legere si le risque correctness ou maintenance est plausible;
+- quality gate simplifiee: commandes passees, preuves, risques residuels et N/A explicites.
+
+### Critical mode
+
+Utiliser seulement pour les changements a fort risque: securite, auth, secrets, permissions, CI/CD, production, infrastructure, Docker, Kubernetes, Terraform, Ansible, migration DB, perte de donnees, performance, scalabilite, cout, gros refactor ou architecture multi-fichiers.
+
+Critical mode active le pipeline auto-verifiant complet.
+
 ## Pipeline auto-verifiant
 
-Pour toute modification non triviale de code, scripts, documentation operatoire, agents, infra ou maintenance, appliquer automatiquement ce pipeline:
+Uniquement en Critical mode, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet en Fast ou Standard sauf escalade explicite par risque concret.
 
 1. `@engineering-pipeline-orchestrator`: definir le perimetre, les criteres de succes, les agents, les validations et les N/A acceptables.
 2. Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`; il peut s'appuyer sur l'agent le plus specifique au stack.
@@ -78,8 +110,11 @@ La gate finale bloque si une validation attendue manque, si une commande echoue 
 
 ## Routage subagents
 
-- Quand une demande correspond clairement a un agent installe dans `~/.codex/agents`, utiliser cet agent automatiquement.
-- Si plusieurs agents correspondent, choisir le plus specifique et le mentionner brievement.
+- Choisir d'abord le mode d'execution: Fast, Standard ou Critical.
+- Fast mode: traiter directement, sauf demande explicite `@agent-name`.
+- Standard mode: utiliser au plus un agent specialiste si le domaine le justifie.
+- Critical mode: utiliser les agents requis par le pipeline auto-verifiant.
+- Si plusieurs agents correspondent, choisir le plus specifique compatible avec le mode.
 - Si aucun agent ne correspond clairement, traiter directement.
 - Si l'utilisateur nomme un agent avec `@agent-name`, utiliser cet agent.
 - Ne pas demander quel agent utiliser sauf ambiguite risquee.
@@ -114,4 +149,4 @@ La gate finale bloque si une validation attendue manque, si une commande echoue 
 
 ## Regle finale
 
-Use subagents.
+Use subagents only when the selected execution mode justifies them.

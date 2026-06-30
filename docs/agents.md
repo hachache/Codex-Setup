@@ -41,6 +41,14 @@ Politique locale:
 - agents avances ou critiques: `xhigh`;
 - `high` interdit pour eviter un palier intermediaire quand le besoin est explicitement "very high".
 
+Politique d'execution:
+
+- Fast mode utilise `medium` et traite directement les petites taches a faible risque.
+- Standard mode peut utiliser un seul agent specialiste quand le domaine le justifie.
+- Critical mode active les agents de pipeline et les agents `xhigh` quand le risque le justifie.
+- Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
+- Preferer le workflow le moins cher qui donne assez de confiance.
+
 ## Blocs obligatoires
 
 Chaque agent doit contenir:
@@ -82,7 +90,7 @@ Ils evitent que `AGENTS.md` reference un agent absent sur un nouveau Mac.
 
 ## Agents de pipeline
 
-Le workflow auto-verifiant repose sur ces agents dedies:
+Le workflow auto-verifiant est reserve au Critical mode. Il repose sur ces agents dedies:
 
 - `engineering-pipeline-orchestrator`: definit le pipeline, les agents requis, les validations et les N/A acceptables.
 - `implementation-engineer`: owner de l'etape d'implementation et du `gate_report` writer; les specialistes stack peuvent rester en support.
