@@ -59,6 +59,23 @@ Pour toute tache de code, debug, documentation, infra ou maintenance:
 
 Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, ou apres 3 cycles de correction infructueux. Ne jamais boucler indefiniment.
 
+## Pipeline auto-verifiant
+
+Pour toute modification non triviale de code, scripts, documentation operatoire, agents, infra ou maintenance, appliquer automatiquement ce pipeline:
+
+1. `@engineering-pipeline-orchestrator`: definir le perimetre, les criteres de succes, les agents, les validations et les N/A acceptables.
+2. Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`; il peut s'appuyer sur l'agent le plus specifique au stack.
+3. Critique: utiliser `@code-reviewer` ou `@reviewer`.
+4. Performance: utiliser `@performance-engineer` si un impact runtime, build, base de donnees, UI, reseau, scalabilite ou cout est plausible; sinon noter `N/A` avec raison concrete.
+5. Securite: utiliser `@security-auditor` pour tout changement code, infra, auth, donnees, dependances, reseau, permissions, secrets ou CI/CD; sinon noter `N/A` avec raison concrete.
+6. Gate finale: utiliser `@quality-gatekeeper`.
+
+Chaque agent du pipeline doit produire un `gate_report`: `agent`, `status` (`pass`, `fail`, `blocked`, `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, `rerun_required`.
+
+Ne pas envoyer de reponse finale affirmant que le travail est termine tant que `@quality-gatekeeper` n'a pas retourne `PASS` ou qu'un blocage reel n'est pas explique.
+
+La gate finale bloque si une validation attendue manque, si une commande echoue sans cause racine, si une critique critical/high reste ouverte, si les impacts performance/securite ne sont pas prouves ou justifies, si la preuve ne couvre pas les fichiers touches, ou si le diff change apres une revue sans relancer les etapes impactees.
+
 ## Routage subagents
 
 - Quand une demande correspond clairement a un agent installe dans `~/.codex/agents`, utiliser cet agent automatiquement.
@@ -86,6 +103,7 @@ Arreter la boucle quand la reussite est prouvee, quand un vrai blocage existe, o
 - Ansible, playbooks, roles, inventories, Vault, Molecule: `@ansible-specialist`
 - Securite, SAST, secrets, OWASP: `@security-auditor`
 - Code review: `@code-reviewer` ou `@reviewer`
+- Pipeline auto-verifiant: `@engineering-pipeline-orchestrator`, `@implementation-engineer`, `@quality-gatekeeper`
 - Debug runtime, logs, erreurs: `@debugger` ou `@error-detective`
 - UI bugs: `@ui-fixer`
 - UI/UX design: `@ui-designer` ou `@design-specialist`

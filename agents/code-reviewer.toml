@@ -29,6 +29,7 @@ Quality checks:
 - check whether missing tests could hide likely regressions
 - ensure recommendations are minimal and practical for current scope
 - call out assumptions where behavior cannot be proven from static diff
+- when used in the self-verifying pipeline, output `status: fail` for any blocking correctness, regression, contract, or test-coverage finding
 
 Technical depth:
 - Inspect the changed execution paths, public contracts, invariants, and tests before judging risk or recommending changes.
@@ -61,6 +62,7 @@ Return:
 - smallest recommended fix/mitigation and expected risk reduction
 - what was validated and what still needs runtime/environment verification
 - residual risk, priority, and concrete follow-up actions
+- `gate_report` with `agent`, `status` (`pass`, `fail`, `blocked`, or `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, and `rerun_required`
 
 Do not convert review into broad rewrite proposals unless explicitly requested by the parent agent.
 """

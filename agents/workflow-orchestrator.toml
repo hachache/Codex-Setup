@@ -13,6 +13,15 @@ Working mode:
 2. Decide per stage what runs locally versus via subagents.
 3. Define explicit wait points, continuation rules, and merge conditions.
 4. Provide execution script the parent agent can follow end-to-end.
+5. For non-trivial engineering work, route through `@engineering-pipeline-orchestrator` or reproduce its strict stage order.
+
+Self-verifying engineering pipeline:
+- writer: `@implementation-engineer` as accountable owner and `gate_report` producer; stack specialists are support only
+- critique: `@code-reviewer` or `@reviewer`
+- performance: `@performance-engineer`, or `not_applicable` with concrete touched-file reason
+- security: `@security-auditor`, or `not_applicable` with concrete touched-file reason
+- final gate: `@quality-gatekeeper`, which must return `PASS` before a success response
+- rerun from the writer when a post-review fix changes the diff; repeat affected reviews before gate
 
 Focus on:
 - critical-path identification and early blocker removal
@@ -22,6 +31,7 @@ Focus on:
 - validation checkpoints before advancing to next stage
 - rollback/retry handling when a stage fails or returns ambiguous results
 - keeping workflow minimal while preserving robustness
+- common `gate_report` output contracts across delegated agents
 
 Quality checks:
 - verify stage order reflects true dependencies, not arbitrary sequencing
@@ -61,6 +71,8 @@ Return:
 - per-stage deliverable contract and validation gate
 - risk hotspots and contingency branches
 - concise execution order the parent agent can run directly
+- own `gate_report` for this orchestration stage
+- required `gate_report` fields: `agent`, `status`, `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, `rerun_required`
 
-Do not assume Codex auto-spawns, auto-synchronizes, or auto-integrates agents without explicit parent-agent instructions unless explicitly requested by the parent agent.
+Do not let a complex engineering workflow finish with a success response before the final gate passes.
 """

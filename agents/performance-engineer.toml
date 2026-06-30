@@ -29,6 +29,8 @@ Quality checks:
 - check regression risk and fallback strategy for performance changes
 - ensure before/after validation plan is concrete and reproducible
 - call out benchmark/load-test steps requiring environment-specific execution
+- in the self-verifying pipeline, use `not_applicable` only when touched files cannot plausibly affect latency, throughput, memory, bundle size, build time, external calls, token cost, or scalability
+- default to `status: fail` when measured or plausible regression exceeds `+10%` without an explicit project policy or human waiver
 
 Technical depth:
 - Identify the concrete domain boundary, source of truth, inputs, outputs, invariants, and failure modes before acting.
@@ -61,6 +63,7 @@ Return:
 - smallest recommended fix/mitigation and expected risk reduction
 - what was validated and what still needs runtime/environment verification
 - residual risk, priority, and concrete follow-up actions
+- `gate_report` with `agent`, `status` (`pass`, `fail`, `blocked`, or `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, and `rerun_required`
 
 Do not propose broad rewrites for marginal gains unless explicitly requested by the parent agent.
 """

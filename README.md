@@ -14,6 +14,7 @@ Docs:
 
 - [Agents](docs/agents.md)
 - [Skills](docs/skills.md)
+- [Pipeline auto-verifiant](docs/quality-gate-pipeline.md)
 
 ## Installation rapide
 

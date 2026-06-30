@@ -11,6 +11,18 @@ die() {
 [ -f "$ROOT_DIR/AGENTS.md" ] || die "AGENTS.md manquant"
 [ -x "$ROOT_DIR/install.sh" ] || die "install.sh doit etre executable"
 [ -d "$ROOT_DIR/agents" ] || die "dossier agents manquant"
+[ -f "$ROOT_DIR/docs/quality-gate-pipeline.md" ] || die "documentation pipeline auto-verifiant manquante"
+[ -f "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" ] || die "agent engineering-pipeline-orchestrator manquant"
+[ -f "$ROOT_DIR/agents/implementation-engineer.toml" ] || die "agent implementation-engineer manquant"
+[ -f "$ROOT_DIR/agents/quality-gatekeeper.toml" ] || die "agent quality-gatekeeper manquant"
+
+grep -q '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" || die "section pipeline auto-verifiant manquante dans AGENTS.md"
+grep -q 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" || die "documentation des agents de pipeline manquante"
+grep -q 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "schema gate_report manquant dans la documentation"
+grep -q 'Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`' "$ROOT_DIR/AGENTS.md" || die "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
+grep -q 'writer: `@implementation-engineer` as accountable owner' "$ROOT_DIR/agents/workflow-orchestrator.toml" || die "workflow-orchestrator doit garder implementation-engineer comme writer owner"
+grep -q 'Select `@implementation-engineer` as the accountable writer stage owner' "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" || die "engineering-pipeline-orchestrator doit garder implementation-engineer comme writer owner"
+grep -q 'Use this agent as the accountable implementation owner' "$ROOT_DIR/agents/implementation-engineer.toml" || die "implementation-engineer doit etre accountable owner"
 
 agent_count=$(find "$ROOT_DIR/agents" -maxdepth 1 -type f -name '*.toml' | wc -l | tr -d ' ')
 [ "$agent_count" -gt 0 ] || die "aucun agent TOML"
@@ -94,6 +106,26 @@ required = {
     "sandbox_mode",
     "developer_instructions",
 }
+pipeline_agents = {
+    "workflow-orchestrator",
+    "engineering-pipeline-orchestrator",
+    "implementation-engineer",
+    "code-reviewer",
+    "reviewer",
+    "performance-engineer",
+    "security-auditor",
+    "quality-gatekeeper",
+}
+gate_fields = {
+    "agent",
+    "status",
+    "scope",
+    "evidence",
+    "commands_run",
+    "blocking_findings",
+    "residual_risks",
+    "rerun_required",
+}
 for path in sorted((root / "agents").glob("*.toml")):
     with path.open("rb") as handle:
         data = tomllib.load(handle)
@@ -114,6 +146,15 @@ for path in sorted((root / "agents").glob("*.toml")):
         raise SystemExit(f"{path}: section Technical depth trop faible")
     if "3 unsuccessful correction cycles" not in loop:
         raise SystemExit(f"{path}: boucle de developpement non bornee")
+    if data["name"] in pipeline_agents:
+        return_block = instructions.rsplit("Return:", 1)[-1]
+        if "gate_report" not in return_block:
+            raise SystemExit(f"{path}: gate_report absent du bloc Return")
+        missing_gate_fields = sorted(field for field in gate_fields if field not in return_block)
+        if missing_gate_fields:
+            raise SystemExit(
+                f"{path}: champs gate_report manquants dans Return: {', '.join(missing_gate_fields)}"
+            )
 template = root / "config" / "config.template.toml"
 if template.exists():
     with template.open("rb") as handle:

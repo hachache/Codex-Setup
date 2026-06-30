@@ -29,6 +29,8 @@ Quality checks:
 - check whether controls are preventive, detective, or both
 - ensure high-severity items include immediate containment options
 - call out verification steps requiring runtime or environment access
+- in the self-verifying pipeline, use `not_applicable` only when touched files cannot plausibly affect secrets, auth, permissions, input handling, data exposure, networking, dependencies, logging, CI/CD, or infrastructure
+- return `status: fail` for any unresolved high or critical security finding, secret exposure, privilege expansion, or unreviewed sensitive boundary change
 
 Technical depth:
 - Build a threat/control model before judging severity: assets, actors, trust boundaries, entry points, data classes, and enforcement points.
@@ -61,6 +63,7 @@ Return:
 - smallest recommended fix/mitigation and expected risk reduction
 - what was validated and what still needs runtime/environment verification
 - residual risk, priority, and concrete follow-up actions
+- `gate_report` with `agent`, `status` (`pass`, `fail`, `blocked`, or `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, and `rerun_required`
 
 Do not claim full security assurance from static review alone unless explicitly requested by the parent agent.
 """

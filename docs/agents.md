@@ -80,6 +80,33 @@ Certains agents existent pour compatibilite avec les habitudes de routage:
 
 Ils evitent que `AGENTS.md` reference un agent absent sur un nouveau Mac.
 
+## Agents de pipeline
+
+Le workflow auto-verifiant repose sur ces agents dedies:
+
+- `engineering-pipeline-orchestrator`: definit le pipeline, les agents requis, les validations et les N/A acceptables.
+- `implementation-engineer`: owner de l'etape d'implementation et du `gate_report` writer; les specialistes stack peuvent rester en support.
+- `quality-gatekeeper`: gate finale qui retourne `PASS` ou `BLOCKED` avant toute reponse finale de completion.
+
+Les autres etapes s'appuient sur les agents existants:
+
+- critique: `code-reviewer` ou `reviewer`;
+- performance: `performance-engineer`;
+- securite: `security-auditor`.
+
+Procedure detaillee: [Pipeline auto-verifiant](quality-gate-pipeline.md).
+
+Chaque agent implique dans le pipeline doit produire un `gate_report` avec:
+
+- `agent`;
+- `status`: `pass`, `fail`, `blocked` ou `not_applicable`;
+- `scope`;
+- `evidence`;
+- `commands_run`;
+- `blocking_findings`;
+- `residual_risks`;
+- `rerun_required`.
+
 ## Validation
 
 ```bash
@@ -93,4 +120,5 @@ La validation controle:
 - coherence `filename == name`;
 - parsing TOML obligatoire via `tomllib` ou `tomli`;
 - presence et contenu minimal des blocs `Technical depth:` et `Development loop:`;
+- presence des agents et de la documentation du pipeline auto-verifiant;
 - scan basique de secrets si `rg` est disponible.
