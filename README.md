@@ -1,6 +1,41 @@
 # Codex Setup
 
-Setup reproductible pour installer le workflow Codex de reference sur un Mac:
+[![CI](https://github.com/hachache/Codex-Setup/actions/workflows/ci.yml/badge.svg)](https://github.com/hachache/Codex-Setup/actions/workflows/ci.yml)
+[![Release](https://github.com/hachache/Codex-Setup/actions/workflows/release.yml/badge.svg)](https://github.com/hachache/Codex-Setup/actions/workflows/release.yml)
+
+Setup Mac reproductible pour transformer Codex en environnement de travail agentique: agents installables, instructions globales, skills personnels, validation locale, CI GitHub Actions et release versionnee.
+
+L'objectif: cloner le depot, lancer un script, retrouver le meme workflow Codex proprement installe sur un autre Mac.
+
+## Ce que ca apporte
+
+- **Reproductibilite**: `AGENTS.md`, agents TOML et skills sont versionnes et reinstallables.
+- **Securite**: aucun secret, auth, cache, session, memory ou plugin local n'est versionne.
+- **Qualite**: `validate.sh`, `doctor.sh`, ShellCheck, Gitleaks, checks whitespace et installation isolee.
+- **Routage intelligent**: Fast, Standard et Critical modes pour eviter de bruler du quota sur les petites taches.
+- **Pipeline critique**: orchestrator, implementer, reviewer, security, performance et gatekeeper seulement quand le risque le justifie.
+- **Release propre**: tag `v*`, archive `tar.gz`, checksum SHA-256 et GitHub Release automatique.
+
+## Avant / apres
+
+| Situation | Avant | Apres |
+|---|---|---|
+| Nouveau Mac | Copier des prompts, agents et fichiers a la main | `git clone`, `./install.sh`, `./scripts/doctor.sh` |
+| Petites taches | Risque de lancer trop d'agents et trop de reasoning | Fast mode: direct, `medium`, validation ciblee |
+| Changement standard | Validation locale dependante de la discipline | Standard mode: tests/checks adaptes + revue legere |
+| Changement critique | Review manuelle et criteres implicites | Critical mode: pipeline auto-verifiant avec gate finale |
+| Publication | Pas d'artefact versionne | Tag `v1.0.0` puis archive release + checksum |
+| Maintenance | Drift entre Mac de reference et depot | `sync-from-local.sh`, `validate.sh`, CI obligatoire |
+
+## Matrice d'execution
+
+| Mode | Quand l'utiliser | Agents | Reasoning | Validation |
+|---|---|---|---|---|
+| Fast | README simple, copy edit, formatage, petit fix shell, changement trivial single-file | Aucun agent multiple sauf demande explicite | `medium` | Diff + commande ciblee si utile |
+| Standard | Feature normale, bug non trivial, refactor modere, script ou doc operatoire | Agent principal + specialiste unique si utile | `medium` ou agent adapte | Tests, lint, build, dry-run ou validation repo |
+| Critical | Securite, auth, secrets, CI/CD, prod, infra, DB, performance, gros refactor, architecture multi-fichiers | Orchestrator, implementation, review, security, perf, gatekeeper | `xhigh` si justifie | Quality gate complet, preuves et N/A explicites |
+
+## Contenu
 
 - instructions globales `~/.codex/AGENTS.md`;
 - agents Codex `~/.codex/agents/*.toml`;
@@ -92,6 +127,13 @@ La CI GitHub Actions impose aussi:
 - scan secrets `Gitleaks` sur l'arbre courant.
 
 Les tags `v*` declenchent le workflow `Release`, qui valide le setup, cree une archive `tar.gz` versionnee et publie une release GitHub avec checksum SHA-256.
+
+Creer la premiere release stable:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 ## Mise a jour depuis le Mac de reference
 
