@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Tool versions
+        run: |
+          git --version
+          python3 --version
+
+      - name: Shell syntax
+        run: |
+          sh -n install.sh
+          sh -n scripts/validate.sh
+          sh -n scripts/doctor.sh
+          sh -n scripts/sync-from-local.sh
+
+      - name: Repository validation
+        run: ./scripts/validate.sh
+
+      - name: Git whitespace check
+        shell: bash
+        run: |
+          zero_sha="0000000000000000000000000000000000000000"
+          before_sha="${{ github.event.before }}"
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git diff --check "${{ github.event.pull_request.base.sha }}...HEAD"
+          elif [[ -n "$before_sha" && "$before_sha" != "$zero_sha" ]]; then
+            git diff --check "$before_sha..HEAD"
+          else
+            git diff-tree --check --root -r HEAD
+          fi
+
+      - name: Text file hygiene
+        shell: bash
+        run: |
+          bad=0
+          while IFS= read -r -d '' file; do
+            if LC_ALL=C grep -q $'\r' "$file"; then
+              printf '%s: CRLF detected\n' "$file" >&2
+              bad=1
+            fi
+            if awk '/[ \t]$/ { printf "%s:%d: trailing whitespace\n", FILENAME, FNR; found=1 } END { exit found }' "$file"; then
+              :
+            else
+              bad=1
+            fi
+          done < <(git grep -Ilz '')
+          exit "$bad"
+
+      - name: Install dry-run
+        run: ./install.sh --dry-run --install-config --no-skills
+
+      - name: Isolated install and doctor
+        shell: bash
+        run: |
+          tmp_home="$(mktemp -d)"
+          CODEX_HOME="$tmp_home/.codex" ./install.sh --install-config
+          CODEX_HOME="$tmp_home/.codex" ./scripts/doctor.sh
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck
+        run: shellcheck install.sh scripts/*.sh
+
+  gitleaks:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Scan current tree secrets
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo" \
+            ghcr.io/gitleaks/gitleaks:v8.24.3 \
+            dir /repo --redact --verbose

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ROOT_DIR=$(unset CDPATH; cd -- "$(dirname -- "$0")/.." && pwd)
 
 die() {
   printf 'ERROR: %s\n' "$*" >&2
@@ -19,10 +19,10 @@ die() {
 grep -q '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" || die "section pipeline auto-verifiant manquante dans AGENTS.md"
 grep -q 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" || die "documentation des agents de pipeline manquante"
 grep -q 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "schema gate_report manquant dans la documentation"
-grep -q 'Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`' "$ROOT_DIR/AGENTS.md" || die "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
-grep -q 'writer: `@implementation-engineer` as accountable owner' "$ROOT_DIR/agents/workflow-orchestrator.toml" || die "workflow-orchestrator doit garder implementation-engineer comme writer owner"
-grep -q 'Select `@implementation-engineer` as the accountable writer stage owner' "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" || die "engineering-pipeline-orchestrator doit garder implementation-engineer comme writer owner"
-grep -q 'Use this agent as the accountable implementation owner' "$ROOT_DIR/agents/implementation-engineer.toml" || die "implementation-engineer doit etre accountable owner"
+grep -F -q "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" "$ROOT_DIR/AGENTS.md" || die "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
+grep -F -q "writer: \`@implementation-engineer\` as accountable owner" "$ROOT_DIR/agents/workflow-orchestrator.toml" || die "workflow-orchestrator doit garder implementation-engineer comme writer owner"
+grep -F -q "Select \`@implementation-engineer\` as the accountable writer stage owner" "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" || die "engineering-pipeline-orchestrator doit garder implementation-engineer comme writer owner"
+grep -F -q "Use this agent as the accountable implementation owner" "$ROOT_DIR/agents/implementation-engineer.toml" || die "implementation-engineer doit etre accountable owner"
 
 agent_count=$(find "$ROOT_DIR/agents" -maxdepth 1 -type f -name '*.toml' | wc -l | tr -d ' ')
 [ "$agent_count" -gt 0 ] || die "aucun agent TOML"

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ROOT_DIR=$(unset CDPATH; cd -- "$(dirname -- "$0")/.." && pwd)
 CODEX_HOME=${CODEX_HOME:-"$HOME/.codex"}
 TARGET_AGENTS="$CODEX_HOME/agents"
 TARGET_SKILLS="$CODEX_HOME/skills"

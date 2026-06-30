@@ -80,6 +80,19 @@ find ~/.codex/agents -maxdepth 1 -type f -name '*.toml' | wc -l
 codex --version
 ```
 
+La CI GitHub Actions impose aussi:
+
+- validation du repo avec `./scripts/validate.sh`;
+- syntaxe shell avec `sh -n`;
+- hygiene LF/whitespace;
+- `git diff --check`;
+- `./install.sh --dry-run --install-config --no-skills`;
+- installation isolee avec `CODEX_HOME=$(mktemp -d)/.codex`;
+- `ShellCheck`;
+- scan secrets `Gitleaks` sur l'arbre courant.
+
+Les tags `v*` declenchent le workflow `Release`, qui valide le setup, cree une archive `tar.gz` versionnee et publie une release GitHub avec checksum SHA-256.
+
 ## Mise a jour depuis le Mac de reference
 
 Depuis ce repo:

@@ -112,7 +112,7 @@ curl -X POST https://{stream-id}.ingest.cloudflare.com \
 ```bash
 curl -X POST https://{stream-id}.ingest.cloudflare.com \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
   -d '[{"event": "data"}]'
 ```
 
@@ -190,7 +190,7 @@ WHERE event_type IN ('purchase', 'refund')
 ## Querying Results (R2 Data Catalog)
 
 ```bash
-export WRANGLER_R2_SQL_AUTH_TOKEN=YOUR_CATALOG_TOKEN
+export WRANGLER_R2_SQL_AUTH_TOKEN="<r2-sql-auth-token>"
 
 npx wrangler r2 sql query "warehouse_name" "
 SELECT
