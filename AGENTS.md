@@ -91,6 +91,28 @@ Utiliser seulement pour les changements a fort risque: securite, auth, secrets, 
 
 Critical mode active le pipeline auto-verifiant complet.
 
+## Efficacite contexte et tokens
+
+Traiter le contexte comme un budget limite. Maximiser la qualite avec le minimum de contexte, d'agents, de latence et de raisonnement necessaires.
+
+- Escalader par risque reel, pas par mot-cle seul.
+- Avant de lire un nouveau fichier, verifier que l'information est requise pour finir correctement.
+- Lire seulement les fichiers, fonctions ou blocs pertinents; eviter le repo entier.
+- Ne pas relire un fichier deja compris sauf s'il a change, si une information manque ou si la confiance est basse.
+- Ne pas charger lockfiles, code genere, assets minifies, vendor, `node_modules` ou artefacts de build sauf necessite explicite.
+- Preferer logs, stack traces, code, markdown et sorties terminal aux screenshots quand le texte suffit.
+- Grouper implementation, verification, revue legere et correction dans le meme passage quand c'est coherent.
+- Limiter les boucles de revue: implementation, review, correction, final review. Par defaut, maximum 2 cycles de correction; Critical peut aller jusqu'au plafond de 3 cycles si un bloqueur concret le justifie.
+- Compresser mentalement le contexte obsolete: garder objectif courant, contraintes, decisions d'architecture et travail restant.
+- Finir, verifier, puis expliquer. Eviter les longues discussions de plan pour les taches simples.
+- Arreter quand les exigences sont satisfaites, les validations adaptees passent et la confiance est suffisante.
+
+La validation doit suivre le risque:
+
+- Fast: diff et verification ciblee seulement.
+- Standard: tests, linters, builds, dry-runs ou validation repo adaptee.
+- Critical: quality gate complet avec preuves et N/A explicites.
+
 ## Pipeline auto-verifiant
 
 Uniquement en Critical mode, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet en Fast ou Standard sauf escalade explicite par risque concret.

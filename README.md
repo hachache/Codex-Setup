@@ -49,6 +49,7 @@ Docs:
 
 - [Agents](docs/agents.md)
 - [Skills](docs/skills.md)
+- [Efficacite contexte et tokens](docs/context-efficiency.md)
 - [Pipeline auto-verifiant](docs/quality-gate-pipeline.md)
 
 ## Installation rapide
