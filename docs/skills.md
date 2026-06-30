@@ -7,6 +7,20 @@ Inclus:
 - `cloudflare-deploy`
 - `cv-site-from-sources`
 - `cytadel-vhost`
+- `lean-audit`
+- `lean-debt`
+- `lean-review`
+
+## Skills Lean
+
+Ces skills reprennent le meilleur du mode minimaliste type Ponytail sans ajouter de hook ou de mode
+persistant.
+
+- `lean-review`: review du diff courant pour over-engineering uniquement.
+- `lean-audit`: audit repo entier pour trouver code, dependances et abstractions supprimables.
+- `lean-debt`: ledger des commentaires `lean:` et `ponytail:` avec plafond et trigger de revisit.
+
+Ils rapportent par defaut et ne patchent pas sans demande explicite.
 
 Exclus volontairement:
 

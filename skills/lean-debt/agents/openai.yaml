@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lean Debt"
+  short_description: "Harvest lean shortcut markers into a ledger"
+  default_prompt: "Use $lean-debt to list every lean: shortcut marker and its revisit trigger."

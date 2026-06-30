@@ -45,6 +45,31 @@
 - Utiliser `apply_patch` pour les edits manuels.
 - Verifier apres modification avec les commandes adaptees.
 
+## Ladder de simplicite
+
+Avant d'ajouter du code, appliquer ce ladder apres avoir compris le flux touche:
+
+1. Est-ce que ca doit vraiment exister maintenant ? Sinon, ne pas le construire.
+2. Est-ce que le repo a deja un helper, composant, role, script, pattern ou config qui couvre le besoin ?
+3. Est-ce que la stdlib, le shell, le framework ou le langage le fait deja ?
+4. Est-ce que la plateforme native le fait deja: navigateur, CSS, base de donnees, Kubernetes, Terraform, Ansible, OS ?
+5. Est-ce qu'une dependance deja installee le fait correctement ?
+6. Est-ce qu'une implementation directe et courte suffit ?
+7. Sinon seulement, ecrire le minimum maintenable qui marche.
+
+Regles:
+
+- Deletion over addition: supprimer, reutiliser ou simplifier avant d'ajouter une abstraction.
+- Pas de nouvelle dependance sans besoin prouve, surface gagnee claire et alternative native insuffisante.
+- Pas d'interface, factory, provider, registry, hook ou config "pour plus tard" avec une seule utilisation reelle.
+- Bugfix = cause racine: inspecter les call sites pertinents et corriger au point partage quand c'est le plus petit fix correct.
+- Non-trivial logic leaves one useful check: test cible, assertion, smoke test ou dry-run qui casserait si la logique casse.
+- Marquer les simplifications volontaires avec `lean:` seulement s'il existe un plafond connu et un trigger de revisit.
+
+Ne jamais simplifier au detriment de la comprehension, securite, validation aux trust boundaries,
+accessibilite, idempotence, rollback, donnees, secrets, permissions, observabilite utile ou demande
+explicite utilisateur.
+
 ## Mode par defaut
 
 Si l'utilisateur ne nomme pas `loop fast`, `fast loop`, `boucle fast`, `loop critical`,

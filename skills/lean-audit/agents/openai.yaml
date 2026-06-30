@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lean Audit"
+  short_description: "Audit a repo for deletable complexity"
+  default_prompt: "Use $lean-audit to audit this repository for removable complexity."

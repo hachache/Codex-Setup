@@ -50,6 +50,8 @@ Politique d'execution:
 - Les agents specialises ne se declenchent pas par mot-cle seul. Ils sont utilises si l'utilisateur
   les nomme, si `loop critical` les requiert, ou si le risque technique justifie clairement un
   specialiste.
+- Les skills Lean (`lean-review`, `lean-audit`, `lean-debt`) sont des outils de simplification
+  explicites; ils ne changent pas le routage automatique des agents.
 - Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
 - Preferer le workflow le moins cher qui donne assez de confiance.
 

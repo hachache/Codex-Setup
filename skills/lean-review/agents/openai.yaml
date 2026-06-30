@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lean Review"
+  short_description: "Review diffs for removable complexity"
+  default_prompt: "Use $lean-review to review this diff for over-engineering only."

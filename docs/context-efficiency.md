@@ -11,8 +11,8 @@ Ne pas escalader par mot-cle seul. Escalader quand la tache touche une surface s
 comportement difficile a verifier, un impact production, une migration, la securite, la performance,
 l'infra ou une architecture multi-fichiers.
 
-Sans invocation de boucle, rester en comportement Codex normal: lire ce qui est utile, modifier, verifier
-de facon adaptee, puis repondre.
+Sans invocation de boucle, rester en comportement Codex normal: lire ce qui est utile, appliquer le
+ladder Lean, modifier, verifier de facon adaptee, puis repondre.
 
 ## Matrice
 
@@ -20,6 +20,7 @@ Defaut Codex:
 - Scope: toute tache sans boucle explicitement nommee.
 - Contexte: fichiers utiles au changement.
 - Agents: aucun subagent par defaut, sauf demande explicite ou besoin specialiste justifie.
+- Lean: YAGNI, reuse local, stdlib, natif plateforme, dependance existante, minimum correct.
 - Validation: commandes adaptees au diff et au risque.
 
 `loop fast`:
@@ -46,6 +47,7 @@ Defaut Codex:
 
 ## Regles de travail
 
+- Appliquer le ladder Lean avant d'ajouter code, dependance ou abstraction.
 - Grouper implementation, verification, revue legere et correction quand c'est coherent.
 - Eviter les arrets intermediaires inutiles sur les taches simples.
 - Finir, verifier, puis expliquer.

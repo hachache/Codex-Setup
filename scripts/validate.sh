@@ -29,15 +29,24 @@ require_contains() {
 [ -d "$ROOT_DIR/agents" ] || die "dossier agents manquant"
 [ -f "$ROOT_DIR/docs/quality-gate-pipeline.md" ] || die "documentation pipeline auto-verifiant manquante"
 [ -f "$ROOT_DIR/docs/context-efficiency.md" ] || die "documentation efficacite contexte/tokens manquante"
+[ -f "$ROOT_DIR/docs/lean-workflow.md" ] || die "documentation workflow Lean manquante"
+[ -f "$ROOT_DIR/docs/native-platform-alternatives.md" ] ||
+  die "documentation alternatives natives manquante"
 [ -f "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" ] ||
   die "agent engineering-pipeline-orchestrator manquant"
 [ -f "$ROOT_DIR/agents/implementation-engineer.toml" ] || die "agent implementation-engineer manquant"
 [ -f "$ROOT_DIR/agents/quality-gatekeeper.toml" ] || die "agent quality-gatekeeper manquant"
+for skill in lean-review lean-audit lean-debt; do
+  [ -f "$ROOT_DIR/skills/$skill/SKILL.md" ] || die "skill $skill manquant"
+  [ -f "$ROOT_DIR/skills/$skill/agents/openai.yaml" ] || die "metadata openai.yaml manquante pour $skill"
+done
 
 require_grep '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" \
   "section pipeline auto-verifiant manquante dans AGENTS.md"
 require_grep "^## Mode par defaut$" "$ROOT_DIR/AGENTS.md" \
   "section mode par defaut manquante dans AGENTS.md"
+require_grep '^## Ladder de simplicite$' "$ROOT_DIR/AGENTS.md" \
+  "section ladder de simplicite manquante dans AGENTS.md"
 require_grep '^## Efficacite contexte et tokens$' "$ROOT_DIR/AGENTS.md" \
   "section efficacite contexte/tokens manquante dans AGENTS.md"
 require_grep '^## Loop fast$' "$ROOT_DIR/AGENTS.md" "loop fast manquante dans AGENTS.md"
@@ -46,6 +55,10 @@ require_contains 'Traiter le contexte comme un budget limite.' "$ROOT_DIR/AGENTS
   "budget contexte manquant dans AGENTS.md"
 require_contains 'La validation doit suivre le risque:' "$ROOT_DIR/AGENTS.md" \
   "validation par risque manquante dans AGENTS.md"
+require_contains 'Est-ce que la stdlib, le shell, le framework ou le langage le fait deja ?' \
+  "$ROOT_DIR/AGENTS.md" "rung stdlib manquant dans AGENTS.md"
+require_contains 'Marquer les simplifications volontaires avec `lean:`' "$ROOT_DIR/AGENTS.md" \
+  "convention lean manquante dans AGENTS.md"
 require_contains "Si l'utilisateur ne nomme pas \`loop fast\`, \`fast loop\`, \`boucle fast\`, \`loop critical\`," \
   "$ROOT_DIR/AGENTS.md" "mode par defaut Codex manquant dans AGENTS.md"
 require_contains 'Escalader la verification par risque reel, sans activer `loop critical` implicitement.' \
@@ -60,12 +73,21 @@ require_contains 'Uniquement en `loop critical`, appliquer automatiquement ce pi
   "$ROOT_DIR/AGENTS.md" "pipeline complet doit etre limite a loop critical dans AGENTS.md"
 require_contains '[Efficacite contexte et tokens](docs/context-efficiency.md)' "$ROOT_DIR/README.md" \
   "README doit referencer la documentation efficacite contexte/tokens"
+require_contains '[Workflow Lean Codex](docs/lean-workflow.md)' "$ROOT_DIR/README.md" \
+  "README doit referencer la documentation workflow Lean"
+require_contains '[Alternatives natives et stdlib](docs/native-platform-alternatives.md)' "$ROOT_DIR/README.md" \
+  "README doit referencer la documentation alternatives natives"
+require_contains '$lean-review' "$ROOT_DIR/README.md" "README doit documenter lean-review"
+require_contains '$lean-audit' "$ROOT_DIR/README.md" "README doit documenter lean-audit"
+require_contains '$lean-debt' "$ROOT_DIR/README.md" "README doit documenter lean-debt"
 require_grep 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" \
   "documentation des agents de pipeline manquante"
 require_grep 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
   "schema gate_report manquant dans la documentation"
 require_contains 'Toujours choisir le plus petit workflow qui donne assez de confiance' \
   "$ROOT_DIR/docs/context-efficiency.md" "principe efficacite manquant dans la documentation"
+require_contains 'Appliquer le ladder Lean avant d'\''ajouter code, dependance ou abstraction.' \
+  "$ROOT_DIR/docs/context-efficiency.md" "ladder Lean manquant dans la documentation efficacite"
 require_contains '## Invocation dans le chat' "$ROOT_DIR/docs/context-efficiency.md" \
   "invocation chat manquante dans la documentation"
 require_contains '`loop fast`' "$ROOT_DIR/docs/context-efficiency.md" \
@@ -82,6 +104,17 @@ require_grep '^### Loop critical$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
   "loop critical manquante dans la documentation pipeline"
 require_contains 'Le workflow auto-verifiant est reserve a `loop critical`.' "$ROOT_DIR/docs/agents.md" \
   "documentation agents doit limiter le pipeline a loop critical"
+require_contains 'Les skills Lean (`lean-review`, `lean-audit`, `lean-debt`) sont des outils de simplification' \
+  "$ROOT_DIR/docs/agents.md" "documentation agents doit mentionner les skills Lean"
+require_contains 'Ce workflow reprend le meilleur de Ponytail sans reprendre son cout permanent' \
+  "$ROOT_DIR/docs/lean-workflow.md" "positionnement Lean manquant"
+require_contains '$lean-review' "$ROOT_DIR/docs/lean-workflow.md" \
+  "documentation lean-review manquante"
+require_contains 'Verifier ces alternatives avant d'\''ajouter une dependance' \
+  "$ROOT_DIR/docs/native-platform-alternatives.md" "principe alternatives natives manquant"
+require_contains '`lean-review`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-review"
+require_contains '`lean-audit`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-audit"
+require_contains '`lean-debt`' "$ROOT_DIR/docs/skills.md" "docs skills doit lister lean-debt"
 require_contains "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" \
   "$ROOT_DIR/AGENTS.md" "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
 require_contains "writer: \`@implementation-engineer\` as accountable owner" \
@@ -106,6 +139,16 @@ fi
 if [ -f "$ROOT_DIR/scripts/doctor.sh" ]; then
   sh -n "$ROOT_DIR/scripts/doctor.sh"
 fi
+
+for skill in lean-review lean-audit lean-debt; do
+  if grep -R '\[TODO:\|TODO' "$ROOT_DIR/skills/$skill" >/dev/null 2>&1; then
+    die "TODO residuel dans skill $skill"
+  fi
+  require_contains "name: $skill" "$ROOT_DIR/skills/$skill/SKILL.md" \
+    "frontmatter name manquant pour $skill"
+  require_contains "Use \$$skill" "$ROOT_DIR/skills/$skill/agents/openai.yaml" \
+    "default_prompt doit mentionner \$$skill"
+done
 
 missing=0
 for file in "$ROOT_DIR"/agents/*.toml; do
