@@ -59,7 +59,13 @@ jobs:
               printf '%s: CRLF detected\n' "$file" >&2
               bad=1
             fi
-            if awk '/[ \t]$/ { printf "%s:%d: trailing whitespace\n", FILENAME, FNR; found=1 } END { exit found }' "$file"; then
+            if awk '
+              /[ \t]$/ {
+                printf "%s:%d: trailing whitespace\n", FILENAME, FNR
+                found=1
+              }
+              END { exit found }
+            ' "$file"; then
               :
             else
               bad=1

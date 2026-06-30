@@ -8,45 +8,93 @@ die() {
   exit 1
 }
 
+require_grep() {
+  pattern=$1
+  file=$2
+  message=$3
+
+  grep -q "$pattern" "$file" || die "$message"
+}
+
+require_contains() {
+  pattern=$1
+  file=$2
+  message=$3
+
+  grep -F -q "$pattern" "$file" || die "$message"
+}
+
 [ -f "$ROOT_DIR/AGENTS.md" ] || die "AGENTS.md manquant"
 [ -x "$ROOT_DIR/install.sh" ] || die "install.sh doit etre executable"
 [ -d "$ROOT_DIR/agents" ] || die "dossier agents manquant"
 [ -f "$ROOT_DIR/docs/quality-gate-pipeline.md" ] || die "documentation pipeline auto-verifiant manquante"
 [ -f "$ROOT_DIR/docs/context-efficiency.md" ] || die "documentation efficacite contexte/tokens manquante"
-[ -f "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" ] || die "agent engineering-pipeline-orchestrator manquant"
+[ -f "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" ] ||
+  die "agent engineering-pipeline-orchestrator manquant"
 [ -f "$ROOT_DIR/agents/implementation-engineer.toml" ] || die "agent implementation-engineer manquant"
 [ -f "$ROOT_DIR/agents/quality-gatekeeper.toml" ] || die "agent quality-gatekeeper manquant"
 
-grep -q '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" || die "section pipeline auto-verifiant manquante dans AGENTS.md"
-grep -q "^## Mode d'execution par defaut$" "$ROOT_DIR/AGENTS.md" || die "section mode d'execution manquante dans AGENTS.md"
-grep -q '^## Efficacite contexte et tokens$' "$ROOT_DIR/AGENTS.md" || die "section efficacite contexte/tokens manquante dans AGENTS.md"
-grep -q '^## Boucles invocables dans le chat$' "$ROOT_DIR/AGENTS.md" || die "section boucles invocables manquante dans AGENTS.md"
-grep -q '^### Fast mode$' "$ROOT_DIR/AGENTS.md" || die "Fast mode manquant dans AGENTS.md"
-grep -q '^### Standard mode$' "$ROOT_DIR/AGENTS.md" || die "Standard mode manquant dans AGENTS.md"
-grep -q '^### Critical mode$' "$ROOT_DIR/AGENTS.md" || die "Critical mode manquant dans AGENTS.md"
-grep -F -q 'Traiter le contexte comme un budget limite.' "$ROOT_DIR/AGENTS.md" || die "budget contexte manquant dans AGENTS.md"
-grep -F -q 'La validation doit suivre le risque:' "$ROOT_DIR/AGENTS.md" || die "validation par risque manquante dans AGENTS.md"
-grep -F -q 'Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.' "$ROOT_DIR/AGENTS.md" || die "boucle canonique manquante dans AGENTS.md"
-grep -F -q 'Chaque retry doit etre justifie par une cause concrete' "$ROOT_DIR/AGENTS.md" || die "retry par cause concrete manquant dans AGENTS.md"
-grep -F -q 'Ne jamais utiliser ' "$ROOT_DIR/AGENTS.md" || die "interdiction xhigh faible risque manquante dans AGENTS.md"
-grep -F -q 'changements triviaux single-file.' "$ROOT_DIR/AGENTS.md" || die "interdiction xhigh faible risque incomplete dans AGENTS.md"
-grep -F -q 'Uniquement en Critical mode, appliquer automatiquement ce pipeline.' "$ROOT_DIR/AGENTS.md" || die "pipeline complet doit etre limite au Critical mode dans AGENTS.md"
-grep -F -q '[Efficacite contexte et tokens](docs/context-efficiency.md)' "$ROOT_DIR/README.md" || die "README doit referencer la documentation efficacite contexte/tokens"
-grep -q 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" || die "documentation des agents de pipeline manquante"
-grep -q 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "schema gate_report manquant dans la documentation"
-grep -F -q 'Toujours choisir le plus petit workflow qui donne assez de confiance' "$ROOT_DIR/docs/context-efficiency.md" || die "principe efficacite manquant dans la documentation"
-grep -F -q '## Invocation dans le chat' "$ROOT_DIR/docs/context-efficiency.md" || die "invocation chat manquante dans la documentation"
-grep -F -q 'Fast loop' "$ROOT_DIR/docs/context-efficiency.md" || die "Fast loop manquante dans la documentation"
-grep -F -q 'Ne jamais relancer une validation echouee sans avoir change la cause pertinente.' "$ROOT_DIR/docs/context-efficiency.md" || die "no blind retry manquant dans la documentation"
-grep -F -q 'residual_risks:' "$ROOT_DIR/docs/context-efficiency.md" || die "evidence ledger manquant dans la documentation"
-grep -q '^### Fast mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "Fast mode manquant dans la documentation pipeline"
-grep -q '^### Standard mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "Standard mode manquant dans la documentation pipeline"
-grep -q '^### Critical mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" || die "Critical mode manquant dans la documentation pipeline"
-grep -F -q 'Le workflow auto-verifiant est reserve au Critical mode.' "$ROOT_DIR/docs/agents.md" || die "documentation agents doit limiter le pipeline au Critical mode"
-grep -F -q "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" "$ROOT_DIR/AGENTS.md" || die "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
-grep -F -q "writer: \`@implementation-engineer\` as accountable owner" "$ROOT_DIR/agents/workflow-orchestrator.toml" || die "workflow-orchestrator doit garder implementation-engineer comme writer owner"
-grep -F -q "Select \`@implementation-engineer\` as the accountable writer stage owner" "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" || die "engineering-pipeline-orchestrator doit garder implementation-engineer comme writer owner"
-grep -F -q "Use this agent as the accountable implementation owner" "$ROOT_DIR/agents/implementation-engineer.toml" || die "implementation-engineer doit etre accountable owner"
+require_grep '^## Pipeline auto-verifiant$' "$ROOT_DIR/AGENTS.md" \
+  "section pipeline auto-verifiant manquante dans AGENTS.md"
+require_grep "^## Mode d'execution par defaut$" "$ROOT_DIR/AGENTS.md" \
+  "section mode d'execution manquante dans AGENTS.md"
+require_grep '^## Efficacite contexte et tokens$' "$ROOT_DIR/AGENTS.md" \
+  "section efficacite contexte/tokens manquante dans AGENTS.md"
+require_grep '^## Boucles invocables dans le chat$' "$ROOT_DIR/AGENTS.md" \
+  "section boucles invocables manquante dans AGENTS.md"
+require_grep '^### Fast mode$' "$ROOT_DIR/AGENTS.md" "Fast mode manquant dans AGENTS.md"
+require_grep '^### Standard mode$' "$ROOT_DIR/AGENTS.md" \
+  "Standard mode manquant dans AGENTS.md"
+require_grep '^### Critical mode$' "$ROOT_DIR/AGENTS.md" \
+  "Critical mode manquant dans AGENTS.md"
+require_contains 'Traiter le contexte comme un budget limite.' "$ROOT_DIR/AGENTS.md" \
+  "budget contexte manquant dans AGENTS.md"
+require_contains 'La validation doit suivre le risque:' "$ROOT_DIR/AGENTS.md" \
+  "validation par risque manquante dans AGENTS.md"
+require_contains 'Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.' \
+  "$ROOT_DIR/AGENTS.md" "boucle canonique manquante dans AGENTS.md"
+require_contains 'Chaque retry doit etre justifie par une cause concrete' "$ROOT_DIR/AGENTS.md" \
+  "retry par cause concrete manquant dans AGENTS.md"
+require_contains 'Ne jamais utiliser ' "$ROOT_DIR/AGENTS.md" \
+  "interdiction xhigh faible risque manquante dans AGENTS.md"
+require_contains 'triviaux single-file.' "$ROOT_DIR/AGENTS.md" \
+  "interdiction xhigh faible risque incomplete dans AGENTS.md"
+require_contains 'Uniquement en Critical mode, appliquer automatiquement ce pipeline.' \
+  "$ROOT_DIR/AGENTS.md" "pipeline complet doit etre limite au Critical mode dans AGENTS.md"
+require_contains '[Efficacite contexte et tokens](docs/context-efficiency.md)' "$ROOT_DIR/README.md" \
+  "README doit referencer la documentation efficacite contexte/tokens"
+require_grep 'quality-gatekeeper' "$ROOT_DIR/docs/agents.md" \
+  "documentation des agents de pipeline manquante"
+require_grep 'gate_report' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "schema gate_report manquant dans la documentation"
+require_contains 'Toujours choisir le plus petit workflow qui donne assez de confiance' \
+  "$ROOT_DIR/docs/context-efficiency.md" "principe efficacite manquant dans la documentation"
+require_contains '## Invocation dans le chat' "$ROOT_DIR/docs/context-efficiency.md" \
+  "invocation chat manquante dans la documentation"
+require_contains 'Fast loop' "$ROOT_DIR/docs/context-efficiency.md" \
+  "Fast loop manquante dans la documentation"
+require_contains 'Ne jamais relancer une validation echouee sans avoir change la cause pertinente.' \
+  "$ROOT_DIR/docs/context-efficiency.md" "no blind retry manquant dans la documentation"
+require_contains 'residual_risks:' "$ROOT_DIR/docs/context-efficiency.md" \
+  "evidence ledger manquant dans la documentation"
+require_grep '^### Fast mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "Fast mode manquant dans la documentation pipeline"
+require_grep '^### Standard mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "Standard mode manquant dans la documentation pipeline"
+require_grep '^### Critical mode$' "$ROOT_DIR/docs/quality-gate-pipeline.md" \
+  "Critical mode manquant dans la documentation pipeline"
+require_contains 'Le workflow auto-verifiant est reserve au Critical mode.' "$ROOT_DIR/docs/agents.md" \
+  "documentation agents doit limiter le pipeline au Critical mode"
+require_contains "Implementation: utiliser \`@implementation-engineer\` comme owner du \`gate_report\`" \
+  "$ROOT_DIR/AGENTS.md" "implementation-engineer doit etre owner du gate_report dans AGENTS.md"
+require_contains "writer: \`@implementation-engineer\` as accountable owner" \
+  "$ROOT_DIR/agents/workflow-orchestrator.toml" \
+  "workflow-orchestrator doit garder implementation-engineer comme writer owner"
+require_contains "Select \`@implementation-engineer\` as the accountable writer stage owner" \
+  "$ROOT_DIR/agents/engineering-pipeline-orchestrator.toml" \
+  "engineering-pipeline-orchestrator doit garder implementation-engineer comme writer owner"
+require_contains "Use this agent as the accountable implementation owner" \
+  "$ROOT_DIR/agents/implementation-engineer.toml" "implementation-engineer doit etre accountable owner"
 
 agent_count=$(find "$ROOT_DIR/agents" -maxdepth 1 -type f -name '*.toml' | wc -l | tr -d ' ')
 [ "$agent_count" -gt 0 ] || die "aucun agent TOML"
@@ -190,7 +238,17 @@ else
 fi
 
 if command -v rg >/dev/null 2>&1; then
-  if rg -n "(sk-(proj|live|test|srv|admin|org)-[A-Za-z0-9_-]{16,}|sk-[A-Za-z0-9_-]{32,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY|password\\s*=\\s*['\\\"][^'\\\"]+|token\\s*=\\s*['\\\"][^'\\\"]+|api[_-]?key\\s*=\\s*['\\\"][^'\\\"]+|secret\\s*=\\s*['\\\"][^'\\\"]+)" "$ROOT_DIR" | rg -v "(your-|<[^>]+>|abc123|example|placeholder|dummy)"; then
+  secret_pattern='(sk-(proj|live|test|srv|admin|org)-[A-Za-z0-9_-]{16,}'
+  secret_pattern="${secret_pattern}|sk-[A-Za-z0-9_-]{32,}"
+  secret_pattern="${secret_pattern}|AKIA[0-9A-Z]{16}"
+  secret_pattern="${secret_pattern}|BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY"
+  secret_pattern="${secret_pattern}|password\\s*=\\s*['\\\"][^'\\\"]+"
+  secret_pattern="${secret_pattern}|token\\s*=\\s*['\\\"][^'\\\"]+"
+  secret_pattern="${secret_pattern}|api[_-]?key\\s*=\\s*['\\\"][^'\\\"]+"
+  secret_pattern="${secret_pattern}|secret\\s*=\\s*['\\\"][^'\\\"]+)"
+  allow_pattern='(your-|<[^>]+>|abc123|example|placeholder|dummy)'
+
+  if rg -n "$secret_pattern" "$ROOT_DIR" | rg -v "$allow_pattern"; then
     die "secret potentiel detecte"
   fi
 fi

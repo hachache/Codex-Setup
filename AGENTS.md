@@ -47,7 +47,8 @@
 
 ## Boucle de developpement automatique
 
-Pour toute tache de code, debug, documentation, infra ou maintenance, utiliser la plus petite boucle bornee qui peut prouver la reussite.
+Pour toute tache de code, debug, documentation, infra ou maintenance, utiliser la plus petite boucle
+bornee qui peut prouver la reussite.
 
 Boucle canonique: inspecter -> implementer -> verifier -> reviewer -> corriger -> gate.
 
@@ -57,17 +58,23 @@ Budgets:
 - Standard loop: 1 a 2 cycles de correction, tests/checks adaptes, revue legere.
 - Critical loop: pipeline complet avec jusqu'a 3 cycles de correction, gate finale obligatoire.
 
-Chaque retry doit etre justifie par une cause concrete: test casse, linter/format, comportement incorrect, manque de preuve, risque securite/performance ou ambiguite utilisateur. Ne jamais relancer une validation echouee sans avoir change la cause pertinente.
+Chaque retry doit etre justifie par une cause concrete: test casse, linter/format, comportement
+incorrect, manque de preuve, risque securite/performance ou ambiguite utilisateur. Ne jamais relancer
+une validation echouee sans avoir change la cause pertinente.
 
-Arreter la boucle quand la reussite est prouvee, quand le risque residuel est acceptable pour le mode choisi, quand un vrai blocage existe, ou quand le budget de retry est epuise. Ne jamais boucler indefiniment.
+Arreter la boucle quand la reussite est prouvee, quand le risque residuel est acceptable pour le mode
+choisi, quand un vrai blocage existe, ou quand le budget de retry est epuise. Ne jamais boucler
+indefiniment.
 
 ## Mode d'execution par defaut
 
-Toujours choisir le workflow le moins cher qui donne une confiance suffisante. Escalader seulement quand le risque le justifie.
+Toujours choisir le workflow le moins cher qui donne une confiance suffisante. Escalader seulement
+quand le risque le justifie.
 
 ### Fast mode
 
-Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de texte, petit script, fix shell localise, changement trivial dans un seul fichier.
+Utiliser pour les petites taches a faible risque: formatage, README simple, copy edit, correction de
+texte, petit script, fix shell localise, changement trivial dans un seul fichier.
 
 - reasoning `medium`;
 - pas de pipeline complet;
@@ -75,11 +82,13 @@ Utiliser pour les petites taches a faible risque: formatage, README simple, copy
 - validation minimale ciblee: lecture du fichier, diff, commande locale pertinente si elle existe;
 - objectif: vitesse, cout bas et preuve suffisante.
 
-Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements triviaux single-file.
+Ne jamais utiliser `xhigh` pour formatage, docs simples, copy edits, petits fixes shell ou changements
+triviaux single-file.
 
 ### Standard mode
 
-Utiliser pour le developpement normal: feature classique, bug non trivial, refactor modere, documentation operatoire, script ou tooling avec effet reel.
+Utiliser pour le developpement normal: feature classique, bug non trivial, refactor modere,
+documentation operatoire, script ou tooling avec effet reel.
 
 - agent principal direct;
 - specialiste unique si le domaine le justifie;
@@ -89,13 +98,16 @@ Utiliser pour le developpement normal: feature classique, bug non trivial, refac
 
 ### Critical mode
 
-Utiliser seulement pour les changements a fort risque: securite, auth, secrets, permissions, CI/CD, production, infrastructure, Docker, Kubernetes, Terraform, Ansible, migration DB, perte de donnees, performance, scalabilite, cout, gros refactor ou architecture multi-fichiers.
+Utiliser seulement pour les changements a fort risque: securite, auth, secrets, permissions, CI/CD,
+production, infrastructure, Docker, Kubernetes, Terraform, Ansible, migration DB, perte de donnees,
+performance, scalabilite, cout, gros refactor ou architecture multi-fichiers.
 
 Critical mode active le pipeline auto-verifiant complet.
 
 ## Boucles invocables dans le chat
 
-L'utilisateur peut forcer une boucle en disant `Fast loop`, `Standard loop`, `Critical loop`, `boucle fast`, `boucle standard` ou `boucle critical`.
+L'utilisateur peut forcer une boucle en disant `Fast loop`, `Standard loop`, `Critical loop`,
+`boucle fast`, `boucle standard` ou `boucle critical`.
 
 - Si la boucle demandee est suffisante pour le risque, l'utiliser explicitement.
 - Si la boucle demandee est trop faible pour le risque, escalader et expliquer brievement la raison.
@@ -114,17 +126,22 @@ residual_risks:
 
 ## Efficacite contexte et tokens
 
-Traiter le contexte comme un budget limite. Maximiser la qualite avec le minimum de contexte, d'agents, de latence et de raisonnement necessaires.
+Traiter le contexte comme un budget limite. Maximiser la qualite avec le minimum de contexte,
+d'agents, de latence et de raisonnement necessaires.
 
 - Escalader par risque reel, pas par mot-cle seul.
 - Avant de lire un nouveau fichier, verifier que l'information est requise pour finir correctement.
 - Lire seulement les fichiers, fonctions ou blocs pertinents; eviter le repo entier.
 - Ne pas relire un fichier deja compris sauf s'il a change, si une information manque ou si la confiance est basse.
-- Ne pas charger lockfiles, code genere, assets minifies, vendor, `node_modules` ou artefacts de build sauf necessite explicite.
+- Ne pas charger lockfiles, code genere, assets minifies, vendor, `node_modules` ou artefacts de build
+  sauf necessite explicite.
 - Preferer logs, stack traces, code, markdown et sorties terminal aux screenshots quand le texte suffit.
 - Grouper implementation, verification, revue legere et correction dans le meme passage quand c'est coherent.
-- Limiter les boucles de revue: implementation, review, correction, final review. Par defaut, maximum 2 cycles de correction; Critical peut aller jusqu'au plafond de 3 cycles si un bloqueur concret le justifie.
-- Compresser mentalement le contexte obsolete: garder objectif courant, contraintes, decisions d'architecture et travail restant.
+- Limiter les boucles de revue: implementation, review, correction, final review. Par defaut,
+  maximum 2 cycles de correction; Critical peut aller jusqu'au plafond de 3 cycles si un bloqueur
+  concret le justifie.
+- Compresser mentalement le contexte obsolete: garder objectif courant, contraintes, decisions
+  d'architecture et travail restant.
 - Finir, verifier, puis expliquer. Eviter les longues discussions de plan pour les taches simples.
 - Arreter quand les exigences sont satisfaites, les validations adaptees passent et la confiance est suffisante.
 
@@ -136,20 +153,31 @@ La validation doit suivre le risque:
 
 ## Pipeline auto-verifiant
 
-Uniquement en Critical mode, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet en Fast ou Standard sauf escalade explicite par risque concret.
+Uniquement en Critical mode, appliquer automatiquement ce pipeline. Ne pas lancer le pipeline complet
+en Fast ou Standard sauf escalade explicite par risque concret.
 
-1. `@engineering-pipeline-orchestrator`: definir le perimetre, les criteres de succes, les agents, les validations et les N/A acceptables.
-2. Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`; il peut s'appuyer sur l'agent le plus specifique au stack.
+1. `@engineering-pipeline-orchestrator`: definir le perimetre, les criteres de succes, les agents,
+   les validations et les N/A acceptables.
+2. Implementation: utiliser `@implementation-engineer` comme owner du `gate_report`; il peut
+   s'appuyer sur l'agent le plus specifique au stack.
 3. Critique: utiliser `@code-reviewer` ou `@reviewer`.
-4. Performance: utiliser `@performance-engineer` si un impact runtime, build, base de donnees, UI, reseau, scalabilite ou cout est plausible; sinon noter `N/A` avec raison concrete.
-5. Securite: utiliser `@security-auditor` pour tout changement code, infra, auth, donnees, dependances, reseau, permissions, secrets ou CI/CD; sinon noter `N/A` avec raison concrete.
+4. Performance: utiliser `@performance-engineer` si un impact runtime, build, base de donnees, UI,
+   reseau, scalabilite ou cout est plausible; sinon noter `N/A` avec raison concrete.
+5. Securite: utiliser `@security-auditor` pour tout changement code, infra, auth, donnees,
+   dependances, reseau, permissions, secrets ou CI/CD; sinon noter `N/A` avec raison concrete.
 6. Gate finale: utiliser `@quality-gatekeeper`.
 
-Chaque agent du pipeline doit produire un `gate_report`: `agent`, `status` (`pass`, `fail`, `blocked`, `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`, `residual_risks`, `rerun_required`.
+Chaque agent du pipeline doit produire un `gate_report`: `agent`, `status` (`pass`, `fail`,
+`blocked`, `not_applicable`), `scope`, `evidence`, `commands_run`, `blocking_findings`,
+`residual_risks`, `rerun_required`.
 
-Ne pas envoyer de reponse finale affirmant que le travail est termine tant que `@quality-gatekeeper` n'a pas retourne `PASS` ou qu'un blocage reel n'est pas explique.
+Ne pas envoyer de reponse finale affirmant que le travail est termine tant que `@quality-gatekeeper`
+n'a pas retourne `PASS` ou qu'un blocage reel n'est pas explique.
 
-La gate finale bloque si une validation attendue manque, si une commande echoue sans cause racine, si une critique critical/high reste ouverte, si les impacts performance/securite ne sont pas prouves ou justifies, si la preuve ne couvre pas les fichiers touches, ou si le diff change apres une revue sans relancer les etapes impactees.
+La gate finale bloque si une validation attendue manque, si une commande echoue sans cause racine,
+si une critique critical/high reste ouverte, si les impacts performance/securite ne sont pas prouves
+ou justifies, si la preuve ne couvre pas les fichiers touches, ou si le diff change apres une revue
+sans relancer les etapes impactees.
 
 ## Routage subagents
 
